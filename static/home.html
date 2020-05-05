@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - RbMima</title>
+</head>
+<body>
+    <p><a href="add">add</a></p>
+
+    <p id="all"></p>
+
+    <script>
+        let allmimas = null;
+        let xhr = new XMLHttpRequest();
+        xhr.responseType = 'json';
+        xhr.open('GET', 'allmimas');
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            document.querySelector('#all').innerText = this.response;
+        }
+        xhr.send();
+    </script>
+</body>
+</html>

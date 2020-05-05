@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add - RbMima</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="main.js"></script>
+</head>
+<body>
+    <p><a href="home">home</a></p>
+
+    <h2>Add a new item</h2>
+
+    <p class="ErrorMessage"></p>
+
+    <form autocomplete="off">
+        <label>Title:
+            <input type="text" id="title" class="TextField" autofocus required
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Username:
+            <input type="text" id="username" class="TextField"
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Password:
+            (<span class="InlineButton" onclick="randomPassword()">random</span>)
+            <input type="text" id="password" class="TextField"
+                oninput="update_color_password()">
+            <div id="colorPassword"></div>
+        </label>
+        <label>Notes:
+            <textarea id="notes" class="TextField"
+                onblur="this.value = this.value.trim()"></textarea>
+        </label>
+        <p><input type="submit" disabled hidden></p>
+        <p><button id="submit">Submit</button></p>
+    </form>
+
+    <script>
+        let errorElem = document.querySelector('.ErrorMessage');
+        let formElem = document.querySelector('form');
+        let titleElem = document.querySelector('#title');
+        let userElem = document.querySelector('#username');
+        let passElem = document.querySelector('#password');
+        let colorPassElem = document.querySelector('#colorPassword');
+        let notesElem = document.querySelector('#notes');
+        let submitBtn = document.querySelector('#submit');
+
+        const textFieldWidth = 300;
+        let textFields = document.querySelectorAll('.TextField');
+        textFields.forEach(e => e.style.width = textFieldWidth + 'px');
+        submitBtn.style.marginLeft = textFieldWidth - submitBtn.offsetWidth + 'px';
+
+        function submit(event) {
+            event.preventDefault();
+            submitBtn.setAttribute('disabled', '');
+
+            let form = new FormData();
+            form.append('title', titleElem.value);
+            form.append('username', userElem.value);
+            form.append('password', passElem.value);
+            form.append('notes', notesElem.value);
+
+            let xhr = new XMLHttpRequest();
+            xhr.responseType = 'json';
+            xhr.open('POST', 'add');
+            xhr.onerror = function () {
+                window.alert('An error occurred during the transaction');
+            }
+            xhr.onload = function () {
+                if (this.status == 200) {
+                    window.location.href = 'home';
+                } else {
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.response}`;
+                }
+            }
+            xhr.addEventListener('loadend', function(){
+                submitBtn.removeAttribute('disabled');
+            });
+            xhr.send(form);
+        }
+        submitBtn.addEventListener('click', submit);
+    </script>
+</body>
+</html>

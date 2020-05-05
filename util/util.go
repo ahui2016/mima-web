@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/base64"
 	"os"
+	"path/filepath"
 )
 
 func Base64Encode(data []byte) string {
@@ -20,4 +21,9 @@ func NewFileScanner(fullPath string) (*bufio.Scanner, *os.File, error) {
 		return nil, nil, err
 	}
 	return bufio.NewScanner(file), file, nil
+}
+
+func GetPathsByExt(dir, ext string) ([]string, error) {
+	pattern := filepath.Join(dir, "*"+ext)
+	return filepath.Glob(pattern)
 }
