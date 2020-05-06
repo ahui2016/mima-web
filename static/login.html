@@ -6,6 +6,11 @@
 </head>
 <body>
     <p id="message"></p>
+    <p id="ok" hidden>Login OK =&gt; <a href="home">home</a></p>
+    <div id="no-more-try" hidden>
+       <p>No more try.</p>
+       <p>Input wrong password too many times.</p>
+    </div>
     <form autocomplete="off">
         <label>
             <input type="password" id="password" autofocus required/>
@@ -18,7 +23,13 @@
         let submitBtn = document.querySelector('#submit');
         let messageElem = document.querySelector('#message');
         let formElem = document.querySelector('form');
+        let okElem = document.querySelector('#ok');
+        let noMoreElem = document.querySelector('#no-more-try');
 
+        function hideFormMessage() {
+            formElem.setAttribute('hidden', '');
+            messageElem.setAttribute('hidden', '');
+        }
         function submit(event) {
             event.preventDefault();
             submitBtn.setAttribute('disabled', '');
@@ -27,22 +38,19 @@
             form.append('password', pwElem.value);
 
             let xhr = new XMLHttpRequest();
-            xhr.responseType = 'json';
-            xhr.open('post', 'login');
+            xhr.open('post', 'api/login');
 
             xhr.onerror = function () {
                 window.alert('An error occurred during the transaction');
             }
             xhr.onload = function () {
                 if (this.status == 200) {
-                    window.location.href = 'home'; return;
-                    formElem.setAttribute('hidden', '');
-                    allmimas = this.response;
-                    console.log(allmimas);
-                    messageElem.innerText = `size: ${allmimas.length}`;
+                    okElem.removeAttribute('hidden');
+                    hideFormMessage();
                 }
                 else if (this.status == 403) {
-                    window.location.href = '/mima/no-more-try';
+                    noMoreElem.removeAttribute('hidden');
+                    hideFormMessage();
                 }
                 else {
                     messageElem.innerText = `Error: ${this.status} ${this.statusText} ${this.response}`;
@@ -50,6 +58,7 @@
             }
             xhr.addEventListener('loadend', function(){
                 submitBtn.removeAttribute('disabled');
+                pwElem.focus();
             });
 
             xhr.send(form);

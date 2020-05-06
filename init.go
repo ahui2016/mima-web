@@ -2,19 +2,38 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
+	"net/http"
 	"path/filepath"
 	"strings"
 
+	mimadb "github.com/ahui2016/mima-web/db"
+	"github.com/ahui2016/mima-web/mima"
+	"github.com/ahui2016/mima-web/session"
 	"github.com/ahui2016/mima-web/util"
 )
 
 const (
 	staticFolder = "static"
+	maxAge       = 30 // seconds
 )
 
-var htmlFiles = make(map[string]string)
+var (
+	db             *mimadb.DB
+	sessionManager *session.Manager
+)
+
+var (
+	htmlFiles = make(map[string]string)
+)
+
+type (
+	Mima = mima.Mima
+)
 
 func init() {
+	db = mimadb.NewDB(util.DatabaseDefaultDir())
+	sessionManager = session.NewManager(maxAge)
 	fillHtmlFiles()
 }
 
@@ -32,4 +51,13 @@ func fillHtmlFiles() {
 		}
 		htmlFiles[name] = string(html)
 	}
+}
+
+func checkErr(w http.ResponseWriter, err error, code int) bool {
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), code)
+		return true
+	}
+	return false
 }

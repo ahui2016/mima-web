@@ -8,24 +8,36 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ahui2016/mima-web/mima"
 	"github.com/ahui2016/mima-web/util"
 )
 
 type DB struct {
-	allItems []*Mima
-	userKey  *SecretKey
-	key      *SecretKey
-	FullPath string
-	Diretory string
+	allItems  []*Mima
+	userKey   *SecretKey
+	key       *SecretKey
+	Directory string
+	FullPath  string
 }
 
-func NewDB() *DB {
-	return new(DB)
+func NewDB(directory string) *DB {
+	return &DB{
+		Directory: directory,
+		FullPath:  filepath.Join(directory, dbName),
+	}
 }
 
-func (db *DB) Create(password, directory string) {
-	db.setPaths(directory)
+func (db *DB) AllItems() []*Mima {
+	return db.allItems
+}
+
+func (db *DB) IsEmpty() bool {
+	if len(db.allItems) > 0 {
+		return false
+	}
+	return true
+}
+
+func (db *DB) Create(password string) {
 	if db.fullPathExist() {
 		log.Fatalf("%s already exists", db.FullPath)
 	}
@@ -44,12 +56,26 @@ func (db *DB) Create(password, directory string) {
 	}
 }
 
-func (db *DB) Init(password, directory string) {
-	db.setPaths(directory)
+func (db *DB) Init(password string) error {
 	if db.fullPathNotExist() {
-		log.Fatalf("%s do not exists", db.FullPath)
+		return fmt.Errorf("%s do not exists", db.FullPath)
 	}
-	db.setKeys(password)
+	if err := db.setKeys(password); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *DB) CheckPassword(password string) bool {
+	userKey := sha256.Sum256([]byte(password))
+	return *db.userKey == userKey
+}
+
+func (db *DB) IsReady() bool {
+	if len(db.allItems) > 0 {
+		return true
+	}
+	return false
 }
 
 func (db *DB) setKeys(password string) error {
@@ -100,17 +126,6 @@ func (db *DB) getFirstItem() (m *Mima, err error) {
 
 func (db *DB) decryptFirst(sealed64 string) (*Mima, error) {
 	return decrypt(sealed64, db.userKey)
-}
-
-func (db *DB) setPaths(directory string) {
-	if directory == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			panic(err)
-		}
-		db.Diretory = filepath.Join(home, dbFolder)
-	}
-	db.FullPath = filepath.Join(db.Diretory, dbName)
 }
 
 func (db *DB) fullPathNotExist() bool {

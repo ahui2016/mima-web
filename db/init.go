@@ -17,7 +17,6 @@ const (
 	KeySize     = 32
 	NonceSize   = 24
 	dbName      = "mimaweb.db"
-	dbFolder    = "MimaWebDB"
 	fragmentExt = ".frag"
 )
 
