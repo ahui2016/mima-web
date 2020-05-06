@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	staticFolder = "static"
-	maxAge       = 30 // seconds
+	staticFolder   = "static"
+	maxAge         = 30 // seconds
+	passwordMaxTry = 3
 )
 
 var (
@@ -24,7 +25,8 @@ var (
 )
 
 var (
-	htmlFiles = make(map[string]string)
+	passwordTry = 0
+	htmlFiles   = make(map[string]string)
 )
 
 type (

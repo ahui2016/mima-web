@@ -66,6 +66,12 @@ func (db *DB) Init(password string) error {
 	return nil
 }
 
+func (db *DB) Reset() {
+	db.allItems = nil
+	db.userKey = nil
+	db.key = nil
+}
+
 func (db *DB) CheckPassword(password string) bool {
 	userKey := sha256.Sum256([]byte(password))
 	return *db.userKey == userKey

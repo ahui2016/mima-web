@@ -12,8 +12,8 @@ import (
 func main() {
 	http.HandleFunc("/", checkLogin(homePage))
 	http.HandleFunc("/home", checkLogin(homePage))
-	http.HandleFunc("/login", loginPage)
-	http.HandleFunc("/api/login", loginHandler)
+	http.HandleFunc("/login", noMore(loginPage))
+	http.HandleFunc("/api/login", noMore(loginHandler))
 
 	addr := "0.0.0.0:9000"
 	fmt.Println(addr)
@@ -38,10 +38,30 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
-	if db.IsReady() {
+
+	// If db is not ready, initialize it.
+	if !db.IsReady() {
+		if err := db.Init(password); err != nil {
+			passwordTry += 1
+			if checkPasswordTry(w) {
+				return
+			}
+			http.Error(w, err.Error(), 400)
+			return
+		}
 	}
-	if checkErr(w, db.Init(password), 400) {
+
+	// if db is ready but it's session has not set.
+	if !db.CheckPassword(password) {
+		passwordTry += 1
+		if checkPasswordTry(w) {
+			return
+		}
+		http.Error(w, "wrong password", 400)
 		return
 	}
+
+	// db is ready and the password is correct.
+	passwordTry = 0
 	sessionManager.Add(w, util.NewID())
 }
