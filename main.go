@@ -10,10 +10,14 @@ import (
 )
 
 func main() {
+	fs := http.FileServer(http.Dir("public/"))
+	http.Handle("/public/", http.StripPrefix("/public/", fs))
+
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/index", checkLogin(indexPage))
 	http.HandleFunc("/login", noMore(loginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
+	http.HandleFunc("/add", checkLogin(addPage))
 
 	addr := "0.0.0.0:9000"
 	fmt.Println(addr)

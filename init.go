@@ -15,7 +15,7 @@ import (
 
 const (
 	staticFolder   = "static"
-	maxAge         = 30 // seconds
+	maxAge         = 60 * 30 // seconds
 	passwordMaxTry = 3
 )
 
