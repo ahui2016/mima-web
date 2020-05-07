@@ -62,16 +62,16 @@
             form.append('notes', notesElem.value);
 
             let xhr = new XMLHttpRequest();
-            xhr.responseType = 'json';
-            xhr.open('POST', 'add');
+            xhr.open('POST', 'api/add');
             xhr.onerror = function () {
                 window.alert('An error occurred during the transaction');
             }
             xhr.onload = function () {
                 if (this.status == 200) {
-                    window.location.href = 'home';
+                    errorElem.innerText = this.responseText;
+                    formElem.setAttribute('hidden', '');
                 } else {
-                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.response}`;
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
                 }
             }
             xhr.addEventListener('loadend', function(){

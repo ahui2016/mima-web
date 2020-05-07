@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
+	"github.com/ahui2016/mima-web/mima"
 	"github.com/ahui2016/mima-web/util"
 )
 
@@ -18,6 +20,8 @@ func main() {
 	http.HandleFunc("/login", noMore(loginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
+	http.HandleFunc("/api/add", checkLogin(addHandler))
+	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
 
 	addr := "0.0.0.0:9000"
 	fmt.Println(addr)
@@ -83,4 +87,22 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func addPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["add"])
+}
+
+func addHandler(w http.ResponseWriter, r *http.Request) {
+	form := &mima.AddForm{
+		Title:    strings.TrimSpace(r.FormValue("title")),
+		Username: strings.TrimSpace(r.FormValue("username")),
+		Password: r.FormValue("password"),
+		Notes:    strings.TrimSpace(r.FormValue("notes")),
+	}
+	m := mima.NewFrom(form)
+	if checkErr(w, db.Insert(m), 400) {
+		return
+	}
+	fmt.Fprint(w, m.ID)
+}
+
+func randomPassword(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, randomString16())
 }

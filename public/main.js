@@ -1,6 +1,6 @@
 function randomPassword () {
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', 'random-password');
+    xhr.open('GET', 'api/random-password');
     xhr.onerror = function () {
         window.alert('An error occurred during the transaction');
     }

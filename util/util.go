@@ -54,3 +54,8 @@ func DatabaseDefaultDir() string {
 	}
 	return filepath.Join(home, databaseFolderName)
 }
+
+func TimestampFilename(ext string) string {
+	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	return name + ext
+}

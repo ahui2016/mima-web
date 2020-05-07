@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ahui2016/mima-web/mima"
 	"github.com/ahui2016/mima-web/util"
 )
 
@@ -131,7 +132,7 @@ func (db *DB) getFirstItem() (m *Mima, err error) {
 }
 
 func (db *DB) decryptFirst(sealed64 string) (*Mima, error) {
-	return decrypt(sealed64, db.userKey)
+	return decrypt64(sealed64, db.userKey)
 }
 
 func (db *DB) fullPathNotExist() bool {
@@ -147,4 +148,37 @@ func (db *DB) fullPathNotExist() bool {
 
 func (db *DB) fullPathExist() bool {
 	return !db.fullPathNotExist()
+}
+
+// Insert inserts a new Mima into the end of db.allItems.
+// The db.allItems is sorted by Mima.UpdatedAt.
+func (db *DB) Insert(m *Mima) error {
+	if m.Title == "" {
+		return errTitleEmpty
+	}
+	db.allItems = append(db.allItems, m)
+	return db.encryptWriteFragment(m, mima.Insert)
+}
+
+func (db *DB) encryptWriteFragment(m *Mima, op Operation) error {
+	m.Operation = op
+	sealed64, err := db.encrypt(m)
+	if err != nil {
+		return nil
+	}
+	return db.writeFragFile(sealed64)
+}
+
+func (db *DB) encrypt(m *Mima) (string, error) {
+	mimaJSON, err := json.Marshal(m)
+	if err != nil {
+		return "", err
+	}
+	return seal64(mimaJSON, db.key)
+}
+
+func (db *DB) writeFragFile(sealed64 string) error {
+	fragPath := filepath.Join(db.Directory, util.TimestampFilename(fragmentExt))
+	log.Print(fragPath)
+	return writeFile(fragPath, sealed64)
 }

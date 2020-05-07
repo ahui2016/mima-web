@@ -39,6 +39,10 @@ func init() {
 	fillHtmlFiles()
 }
 
+func randomString16() string {
+	return mimadb.RandomString64()[0:16]
+}
+
 func fillHtmlFiles() {
 	filePaths, err := util.GetPathsByExt(staticFolder, ".html")
 	if err != nil {

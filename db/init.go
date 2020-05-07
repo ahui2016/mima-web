@@ -20,20 +20,25 @@ const (
 	fragmentExt = ".frag"
 )
 
+var (
+	errTitleEmpty = errors.New("mima.Title is empty")
+)
+
 type (
 	Nonce     = [NonceSize]byte
 	SecretKey = [KeySize]byte
 	Mima      = mima.Mima
+	Operation = mima.Operation
 )
 
 // NewFirstMima create the very first mima, to save a random serect key.
 func newFirstMima() *Mima {
-	mima := new(Mima)
+	m := new(Mima)
 	key := randomKey()
-	mima.Username = randomString64()
-	mima.Password = util.Base64Encode(key[:])
-	mima.CreatedAt = time.Now().UnixNano()
-	return mima
+	m.Username = RandomString64()
+	m.Password = util.Base64Encode(key[:])
+	m.CreatedAt = time.Now().UnixNano()
+	return m
 }
 
 func newNonce() (nonce Nonce, err error) {
@@ -50,7 +55,7 @@ func seal64(data []byte, key *SecretKey) (string, error) {
 	return util.Base64Encode(sealed), nil
 }
 
-func decrypt(sealed64 string, key *SecretKey) (*Mima, error) {
+func decrypt64(sealed64 string, key *SecretKey) (*Mima, error) {
 	sealed, err := util.Base64Decode(sealed64)
 	if err != nil {
 		return nil, err
@@ -64,11 +69,11 @@ func decrypt(sealed64 string, key *SecretKey) (*Mima, error) {
 	if !ok {
 		return nil, errors.New("db.decrypt: secretbox open fail")
 	}
-	mima := new(Mima)
-	if err := json.Unmarshal(mimaJSON, mima); err != nil {
+	m := new(Mima)
+	if err := json.Unmarshal(mimaJSON, m); err != nil {
 		return nil, err
 	}
-	return mima, nil
+	return m, nil
 }
 
 func base64DecodeToSecretKey(s string) (*SecretKey, error) {
@@ -89,7 +94,7 @@ func writeFile(fullPath, sealed64 string) error {
 	return ioutil.WriteFile(fullPath, []byte(sealed64), 0644)
 }
 
-func randomString64() string {
+func RandomString64() string {
 	size := 64
 	someBytes := make([]byte, size)
 	if _, err := rand.Read(someBytes); err != nil {
@@ -99,5 +104,5 @@ func randomString64() string {
 }
 
 func randomKey() SecretKey {
-	return sha256.Sum256([]byte(randomString64()))
+	return sha256.Sum256([]byte(RandomString64()))
 }
