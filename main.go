@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", checkLogin(homePage))
-	http.HandleFunc("/home", checkLogin(homePage))
+	http.HandleFunc("/", homePage)
+	http.HandleFunc("/index", checkLogin(indexPage))
 	http.HandleFunc("/login", noMore(loginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
 
@@ -21,6 +21,17 @@ func main() {
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/":
+		fallthrough
+	case "/home":
+		http.Redirect(w, r, "/index", 302)
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+func indexPage(w http.ResponseWriter, r *http.Request) {
 	if db.IsEmpty() {
 		http.Redirect(w, r, "/login", 303)
 		return
@@ -64,4 +75,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// db is ready and the password is correct.
 	passwordTry = 0
 	sessionManager.Add(w, util.NewID())
+}
+
+func addPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["add"])
 }

@@ -15,6 +15,8 @@ func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
 				fmt.Fprint(w, htmlFiles["login"])
 				return
 			}
+
+			// http.MethodGet
 			http.Error(w, "Logged Out", 400)
 			return
 		}
@@ -25,11 +27,11 @@ func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
 // noMore is a middleware only apply to login.
 func noMore(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !isLoggedOut(r) {
-			http.Error(w, "You've logged in.", 400)
+		if checkPasswordTry(w) {
 			return
 		}
-		if checkPasswordTry(w) {
+		if !isLoggedOut(r) {
+			http.Error(w, "You've logged in.", 400)
 			return
 		}
 		fn(w, r)
