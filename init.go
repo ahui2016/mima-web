@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	prefix         = "/mima"
 	staticFolder   = "static"
 	maxAge         = 60 * 30 // seconds
 	passwordMaxTry = 3
@@ -57,6 +58,10 @@ func fillHtmlFiles() {
 		}
 		htmlFiles[name] = string(html)
 	}
+}
+
+func redirect(w http.ResponseWriter, r *http.Request, url string, code int) {
+	http.Redirect(w, r, prefix+url, 302)
 }
 
 func checkErr(w http.ResponseWriter, err error, code int) bool {

@@ -7,6 +7,12 @@ label {
     margin-top: 1em;
 }
 
+#ErrorMessage {
+    color: white;
+    background-color: red;
+    font-weight: bold;
+}
+
 .TextField {
     font-size: inherit;
     font-family: inherit;

@@ -27,10 +27,6 @@ func NewDB(directory string) *DB {
 	}
 }
 
-func (db *DB) AllItems() []*Mima {
-	return db.allItems
-}
-
 func (db *DB) IsEmpty() bool {
 	if len(db.allItems) > 0 {
 		return false
@@ -181,4 +177,36 @@ func (db *DB) writeFragFile(sealed64 string) error {
 	fragPath := filepath.Join(db.Directory, util.TimestampFilename(fragmentExt))
 	log.Print(fragPath)
 	return writeFile(fragPath, sealed64)
+}
+
+// AllItems return all items except the very first item and soft-deleted items,
+// and hides password and notes. Sorted decending by Mima.UpdatedAt.
+// TODO: cache
+func (db *DB) AllItems() (all []*Mima) {
+	if db.Len()-1 == 0 {
+		return
+	}
+	for i := db.Len() - 1; i > 0; i-- {
+		m := db.allItems[i].HideSecrets()
+		if m.IsDeleted() {
+			continue
+		}
+		all = append(all, m)
+	}
+	return
+}
+
+func (db *DB) Len() int {
+	return len(db.allItems)
+}
+
+func (db *DB) GeyByID(id string) (i int, m *Mima, err error) {
+	for i = 1; i < db.Len(); i++ {
+		m = db.allItems[i]
+		if m.ID == id {
+			return
+		}
+		err = fmt.Errorf("id: %s not found", id)
+		return
+	}
 }

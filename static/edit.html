@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add - mima</title>
+    <title>Edit - mima</title>
     <link rel="stylesheet" href="public/style.css">
     <script type="text/javascript" src="public/main.js"></script>
 </head>
 <body>
     <p><a href="home">home</a></p>
 
-    <h2>Add a new item</h2>
+    <h2>Edit - mima</h2>
 
     <p id="ErrorMessage"></p>
 
-    <p id="ok" hidden>OK, <a></a> is added.</p>
+    <p id="ok" hidden>Edit OK =&gt; <a href="home">home</a></p>
 
     <form autocomplete="off">
         <label>Title:
             <input type="text" id="title" class="TextField" autofocus required
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>
+            <input type="text" id="alias" class="TextField"
                 onblur="this.value = this.value.trim()">
         </label>
         <label>Username:
@@ -44,16 +48,41 @@
         let ok_a_elem = document.querySelector('#ok>a');
         let formElem = document.querySelector('form');
         let titleElem = document.querySelector('#title');
+        let aliasElem = document.querySelector('#alias');
         let userElem = document.querySelector('#username');
         let passElem = document.querySelector('#password');
         let colorPassElem = document.querySelector('#colorPassword');
         let notesElem = document.querySelector('#notes');
         let submitBtn = document.querySelector('#submit');
 
+        // set length
         const textFieldWidth = 300;
         let textFields = document.querySelectorAll('.TextField');
         textFields.forEach(e => e.style.width = textFieldWidth + 'px');
         submitBtn.style.marginLeft = textFieldWidth - submitBtn.offsetWidth + 'px';
+
+        // set data
+        let loc = new URL(document.location);
+        let id = loc.searchParams.get('id');
+        let mima = null;
+        setData();
+
+        function setData() {
+            let form = new FormData();
+            form.append('id', id);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api/item');
+
+            xhr.onload = function () {
+                if (this.status == 200) {
+                    mima = json.parse(this.responseText);
+                    console.log(mima);
+                } else {
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+                }
+            }
+        }
 
         function submit(event) {
             event.preventDefault();
@@ -67,12 +96,13 @@
 
             let form = new FormData();
             form.append('title', title);
+            form.append('alias', userElem.value);
             form.append('username', userElem.value);
             form.append('password', passElem.value);
             form.append('notes', notesElem.value);
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', 'api/add');
+            xhr.open('POST', 'api/edit');
             xhr.onerror = function () {
                 window.alert('An error occurred during the transaction');
             }

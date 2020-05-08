@@ -2,26 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Mima</title>
+    <title>Login - mima</title>
+    <link rel="stylesheet" href="public/style.css">
 </head>
 <body>
-    <p id="message"></p>
+    <p id="ErrorMessage"></p>
     <p id="ok" hidden>Login OK =&gt; <a href="home">home</a></p>
     <div id="no-more-try" hidden>
        <p>No more try.</p>
        <p>Input wrong password too many times.</p>
     </div>
     <form autocomplete="off">
-        <label>
-            <input type="password" id="password" autofocus required/>
-        </label>
+        <input type="password" id="password" autofocus required/>
         <input id="submit" type="submit" value="login" />
     </form>
 
     <script>
         let pwElem = document.querySelector('#password');
         let submitBtn = document.querySelector('#submit');
-        let messageElem = document.querySelector('#message');
+        let messageElem = document.querySelector('#ErrorMessage');
         let formElem = document.querySelector('form');
         let okElem = document.querySelector('#ok');
         let noMoreElem = document.querySelector('#no-more-try');

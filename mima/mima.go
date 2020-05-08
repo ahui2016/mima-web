@@ -37,12 +37,30 @@ func NewFrom(form *AddForm) *Mima {
 	}
 }
 
+func clone(m Mima) Mima {
+	return m
+}
+
+func (m *Mima) HideSecrets() *Mima {
+	m2 := clone(*m)
+	if m2.Password != "" {
+		m2.Password = "******"
+	}
+	m2.Notes = ""
+	m2.History = nil
+	return &m2
+}
+
+func (m *Mima) IsDeleted() bool {
+	return m.DeletedAt > 0
+}
+
 type History struct {
-	Title    string
-	Username string
-	Password string
-	Notes    string
-	DateTime string
+	Title     string
+	Username  string
+	Password  string
+	Notes     string
+	Timestamp int64
 }
 
 type AddForm struct {

@@ -22,8 +22,10 @@ func main() {
 	http.HandleFunc("/add", checkLogin(addPage))
 	http.HandleFunc("/api/add", checkLogin(addHandler))
 	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
+	http.HandleFunc("/edit", checkLogin(editPage))
+	http.HandleFunc("/api/item", checkLogin(getItemHandler))
 
-	addr := "0.0.0.0:9000"
+	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
@@ -31,9 +33,10 @@ func main() {
 func homePage(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
+		log.Print(r.URL.Path)
 		fallthrough
 	case "/home":
-		http.Redirect(w, r, "/index", 302)
+		redirect(w, r, "/index", 302)
 	default:
 		http.NotFound(w, r)
 	}
@@ -61,7 +64,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// If db is not ready, initialize it.
 	if !db.IsReady() {
 		if err := db.Init(password); err != nil {
-			passwordTry += 1
+			passwordTry++
 			if checkPasswordTry(w) {
 				return
 			}
@@ -105,4 +108,12 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 
 func randomPassword(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, randomString16())
+}
+
+func editPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["edit"])
+}
+
+func getItemHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
 }
