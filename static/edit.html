@@ -20,7 +20,7 @@
             <input type="text" id="title" class="TextField" autofocus required
                 onblur="this.value = this.value.trim()">
         </label>
-        <label>
+        <label>Alias:
             <input type="text" id="alias" class="TextField"
                 onblur="this.value = this.value.trim()">
         </label>
@@ -74,14 +74,23 @@
             let xhr = new XMLHttpRequest();
             xhr.open('POST', 'api/item');
 
+            xhr.onerror = function () {
+                window.alert('An error occurred during the transaction');
+            }
             xhr.onload = function () {
                 if (this.status == 200) {
-                    mima = json.parse(this.responseText);
-                    console.log(mima);
+                    mima = JSON.parse(this.responseText);
+                    titleElem.value = mima.Title;
+                    aliasElem.value = mima.Alias;
+                    userElem.value = mima.Username;
+                    passElem.value = mima.Password;
+                    notesElem.value = mima.Notes;
+                    update_color_password();
                 } else {
                     errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
                 }
             }
+            xhr.send(form);
         }
 
         function submit(event) {

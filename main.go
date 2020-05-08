@@ -116,4 +116,13 @@ func editPage(w http.ResponseWriter, r *http.Request) {
 
 func getItemHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
+	_, m, err := db.GetByID(id)
+	if checkErr(w, err, 400) {
+		return
+	}
+	mJSON, err := json.Marshal(m)
+	if checkErr(w, err, 500) {
+		return
+	}
+	fmt.Fprint(w, string(mJSON))
 }

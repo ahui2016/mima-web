@@ -200,13 +200,13 @@ func (db *DB) Len() int {
 	return len(db.allItems)
 }
 
-func (db *DB) GeyByID(id string) (i int, m *Mima, err error) {
+func (db *DB) GetByID(id string) (i int, m *Mima, err error) {
 	for i = 1; i < db.Len(); i++ {
 		m = db.allItems[i]
 		if m.ID == id {
 			return
 		}
-		err = fmt.Errorf("id: %s not found", id)
-		return
 	}
+	err = fmt.Errorf("id: %s not found", id)
+	return
 }
