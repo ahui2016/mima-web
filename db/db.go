@@ -3,6 +3,7 @@ package db
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -54,6 +55,9 @@ func (db *DB) Create(password string) {
 }
 
 func (db *DB) Init(password string) error {
+	if db.IsReady() {
+		return errors.New("DB.allItems is not empty")
+	}
 	if db.fullPathNotExist() {
 		return fmt.Errorf("%s do not exists", db.FullPath)
 	}
@@ -127,8 +131,36 @@ func (db *DB) getFirstItem() (m *Mima, err error) {
 	return
 }
 
+// retrieveItems retrieves all items (except the first one) from db.FullPath.
+func (db *DB) retrieveItems() error {
+	scanner, file, err := util.NewFileScanner(db.FullPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	n := 0
+	for scanner.Scan() {
+		n++
+		sealed64 := scanner.Text()
+		if n == 1 {
+			continue
+		}
+		m, err := db.decrypt(sealed64)
+		if err != nil {
+			return fmt.Errorf("decrypting line %d : %w", n, err)
+		}
+		db.allItems = append(db.allItems, m)
+	}
+	return scanner.Err()
+}
+
 func (db *DB) decryptFirst(sealed64 string) (*Mima, error) {
 	return decrypt64(sealed64, db.userKey)
+}
+
+func (db *DB) decrypt(sealed64 string) (*Mima, error) {
+	return decrypt64(sealed64, db.key)
 }
 
 func (db *DB) fullPathNotExist() bool {

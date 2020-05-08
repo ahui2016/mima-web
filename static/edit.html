@@ -120,8 +120,6 @@
                     formElem.setAttribute('hidden', '');
                     errorElem.setAttribute('hidden', '');
                     okElem.removeAttribute('hidden');
-                    ok_a_elem.innerText = title;
-                    ok_a_elem.setAttribute('href', `edit?id=${this.responseText}`);
                 } else {
                     errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
                 }
