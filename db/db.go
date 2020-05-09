@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
@@ -40,13 +41,10 @@ func (db *DB) Create(password string) {
 	if db.fullPathExist() {
 		log.Fatalf("%s already exists", db.FullPath)
 	}
-	m := newFirstMima()
-	mimaJSON, err := json.Marshal(m)
-	if err != nil {
-		panic(err)
-	}
 	userKey := sha256.Sum256([]byte(password))
-	sealed64, err := seal64(mimaJSON, &userKey)
+	db.userKey = &userKey
+	m := newFirstMima()
+	sealed64, err := db.encryptFirst(m)
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +73,38 @@ func (db *DB) Init(password string) error {
 	if len(fragFiles) == 0 {
 		return nil
 	}
-	return nil
+	if err := db.updateFromFragments(fragFiles); err != nil {
+		return err
+	}
+	if err := db.rewriteFullPath(); err != nil {
+		return err
+	}
+	return util.DeleteFiles(fragFiles)
+}
+
+func (db *DB) rewriteFullPath() error {
+	dbFile, err := os.Create(db.FullPath)
+	if err != nil {
+		return err
+	}
+	defer dbFile.Close()
+
+	var sealed64 string
+	dbWriter := bufio.NewWriter(dbFile)
+	for i, m := range db.allItems {
+		if i == 0 {
+			sealed64, err = db.encryptFirst(m)
+		} else {
+			sealed64, err = db.encrypt(m)
+		}
+		if err != nil {
+			return err
+		}
+		if err := util.BufWriteln(dbWriter, sealed64); err != nil {
+			return err
+		}
+	}
+	return dbWriter.Flush()
 }
 
 func (db *DB) updateFromFragments(fragFiles []string) error {
@@ -277,6 +306,14 @@ func (db *DB) encrypt(m *Mima) (string, error) {
 		return "", err
 	}
 	return seal64(mimaJSON, db.key)
+}
+
+func (db *DB) encryptFirst(m *Mima) (string, error) {
+	mimaJSON, err := json.Marshal(m)
+	if err != nil {
+		return "", err
+	}
+	return seal64(mimaJSON, db.userKey)
 }
 
 func (db *DB) writeFragFile(sealed64 string) error {

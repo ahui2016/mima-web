@@ -65,3 +65,17 @@ func TimestampFilename(ext string) string {
 	name := strconv.FormatInt(time.Now().UnixNano(), 10)
 	return name + ext
 }
+
+func BufWriteln(w *bufio.Writer, box64 string) (err error) {
+	_, err = w.WriteString(box64 + "\n")
+	return
+}
+
+func DeleteFiles(filePaths []string) error {
+	for _, f := range filePaths {
+		if err := os.Remove(f); err != nil {
+			return err
+		}
+	}
+	return nil
+}
