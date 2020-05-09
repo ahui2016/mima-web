@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All - mima</title>
+</head>
+<body>
+    <ul id="item-list">
+        <template id="item-tmpl">
+            <li>
+                <div>
+                    <strong class="Title"></strong>
+                    <span class="TitleButton">
+                        <a class="EditButton">edit</a>
+                        <a class="DeleteButton">del</a>
+                    </span>
+                    <br>
+                    <span class="Alias"></span>
+                    <span class="Username"></span>
+                </div>
+            </li>
+        </template>
+    </ul>
+
+    <script>
+    let itemListElem = document.querySelector('#item-list');
+    let itemTmplElem = document.querySelector('#item-tmpl');
+
+    refillList();
+
+    function refillList() {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', 'api/all-items');
+
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                let allItems = JSON.parse(this.responseText);
+                for (let item of allItems) {
+                    let itemNode = itemTmplElem.content.cloneNode(true);
+                    let itemDiv = itemNode.querySelector('div');
+                    let titleElem = itemDiv.querySelector('.Title');
+                    let editBtnElem = itemDiv.querySelector('.EditButton');
+                    let delBtnElem = itemDiv.querySelector('.DeleteButton');
+                    let aliasElem = itemDiv.querySelector('.Alias');
+                    let userElem = itemDiv.querySelector('.Username');
+
+                    titleElem.innerText = item.Title;
+                    editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
+                    delBtnElem.setAttribute('href', `delete?id=${item.ID}`);
+                    if (item.Alias) {
+                        aliasElem.innerText = `[${item.Alias}]`;
+                    }
+                    if (item.Username) {
+                        userElem.innerText = item.Username;
+                    }
+
+                    itemListElem.appendChild(itemNode);
+                }
+            } else {
+                errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+            }
+        }
+        xhr.send();
+    }
+    </script>
+</body>
+</html>

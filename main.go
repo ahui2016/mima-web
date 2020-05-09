@@ -17,6 +17,7 @@ func main() {
 
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/index", checkLogin(indexPage))
+	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
@@ -43,10 +44,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
-	if db.IsEmpty() {
-		http.Redirect(w, r, "/login", 303)
-		return
-	}
+	fmt.Fprint(w, htmlFiles["index"])
+}
+
+func getAllHandler(w http.ResponseWriter, r *http.Request) {
 	allItems, err := json.Marshal(db.AllItems())
 	if checkErr(w, err, 500) {
 		return

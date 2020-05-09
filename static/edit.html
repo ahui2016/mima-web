@@ -64,7 +64,6 @@
         // set data
         let loc = new URL(document.location);
         let id = loc.searchParams.get('id');
-        let mima = null;
         setData();
 
         function setData() {
@@ -79,7 +78,7 @@
             }
             xhr.onload = function () {
                 if (this.status == 200) {
-                    mima = JSON.parse(this.responseText);
+                    let mima = JSON.parse(this.responseText);
                     titleElem.value = mima.Title;
                     aliasElem.value = mima.Alias;
                     userElem.value = mima.Username;
