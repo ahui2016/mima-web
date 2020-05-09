@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -64,7 +65,80 @@ func (db *DB) Init(password string) error {
 	if err := db.setKeys(password); err != nil {
 		return err
 	}
+	if err := db.refillItems(); err != nil {
+		return err
+	}
+	fragFiles, err := db.getFragments()
+	if err != nil {
+		return err
+	}
+	if len(fragFiles) == 0 {
+		return nil
+	}
 	return nil
+}
+
+func (db *DB) updateFromFragments(fragFiles []string) error {
+	for _, f := range fragFiles {
+		frag, err := db.readAndDecrypt(f)
+		if err != nil {
+			return err
+		}
+		if frag.Operation == mima.Insert {
+			db.allItems = append(db.allItems, frag)
+			continue
+		}
+		i, item, err := db.GetByID(frag.ID)
+		if err != nil {
+			return err
+		}
+		switch frag.Operation {
+		case mima.Insert: // already proccess above
+		case mima.Update:
+			if item.UpdateFrom(frag) {
+				db.allItems = append(db.allItems, item)
+				db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
+			}
+		case mima.SoftDelete:
+			item.Delete()
+		case mima.UnDelete:
+			item.UnDelete()
+		case mima.DeleteForever:
+			if _, err := db.deleteByID(item.ID); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (db *DB) deleteByID(id string) (*Mima, error) {
+	i, m, err := db.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
+	return m, nil
+}
+
+func (db *DB) DeleteForeverByID(id string) error {
+	m, err := db.deleteByID(id)
+	if err != nil {
+		return err
+	}
+	return db.encryptWriteFragment(m, mima.DeleteForever)
+}
+
+func (db *DB) readAndDecrypt(filePath string) (*Mima, error) {
+	blob, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return db.decrypt(string(blob))
+}
+
+func (db *DB) getFragments() ([]string, error) {
+	return util.GetPathsByExt(db.Directory, fragmentExt)
 }
 
 func (db *DB) Reset() {
@@ -131,8 +205,8 @@ func (db *DB) getFirstItem() (m *Mima, err error) {
 	return
 }
 
-// retrieveItems retrieves all items (except the first one) from db.FullPath.
-func (db *DB) retrieveItems() error {
+// refillItems retrieves all items (except the first one) from db.FullPath.
+func (db *DB) refillItems() error {
 	scanner, file, err := util.NewFileScanner(db.FullPath)
 	if err != nil {
 		return err

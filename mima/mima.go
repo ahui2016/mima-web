@@ -51,6 +51,30 @@ func (m *Mima) HideSecrets() *Mima {
 	return &m2
 }
 
+// UpdateFrom updates m when fragment.Operation is Update.
+func (m *Mima) UpdateFrom(fragment *Mima) (changeIndex bool) {
+	m.Alias = fragment.Alias
+	m.History = fragment.History
+	if m.UpdatedAt == fragment.UpdatedAt {
+		return false
+	}
+	m.Title = fragment.Title
+	m.Username = fragment.Username
+	m.Password = fragment.Password
+	m.Notes = fragment.Notes
+	m.UpdatedAt = fragment.UpdatedAt
+	return true
+}
+
+// Delete soft-delete itself.
+func (m *Mima) Delete() {
+	m.DeletedAt = time.Now().UnixNano()
+}
+
+func (m *Mima) UnDelete() {
+	m.DeletedAt = 0
+}
+
 func (m *Mima) IsDeleted() bool {
 	return m.DeletedAt > 0
 }

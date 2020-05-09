@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -44,7 +45,12 @@ func NewFileScanner(fullPath string) (*bufio.Scanner, *os.File, error) {
 
 func GetPathsByExt(dir, ext string) ([]string, error) {
 	pattern := filepath.Join(dir, "*"+ext)
-	return filepath.Glob(pattern)
+	filePaths, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(filePaths)
+	return filePaths, nil
 }
 
 func DatabaseDefaultDir() string {
