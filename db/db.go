@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	"github.com/ahui2016/mima-web/mima"
+	"github.com/ahui2016/mima-web/tarball"
 	"github.com/ahui2016/mima-web/util"
 )
 
@@ -73,6 +74,13 @@ func (db *DB) Init(password string) error {
 	if len(fragFiles) == 0 {
 		return nil
 	}
+	filesToBackup := append(fragFiles, db.FullPath)
+	if err := db.backupToTar(filesToBackup); err != nil {
+		return err
+	}
+	if err := db.removeOldTarball(); err != nil {
+		return err
+	}
 	if err := db.updateFromFragments(fragFiles); err != nil {
 		return err
 	}
@@ -80,6 +88,24 @@ func (db *DB) Init(password string) error {
 		return err
 	}
 	return util.DeleteFiles(fragFiles)
+}
+
+func (db *DB) removeOldTarball() error {
+	tarballs, err := db.getTarPaths()
+	if err != nil {
+		return err
+	}
+	if len(tarballs) > maxTarballs {
+		if err := os.Remove(tarballs[0]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (db *DB) backupToTar(files []string) error {
+	tarFilePath := filepath.Join(db.Directory, util.TimestampFilename(tarballExt))
+	return tarball.Create(tarFilePath, files)
 }
 
 func (db *DB) rewriteFullPath() error {
@@ -124,39 +150,46 @@ func (db *DB) updateFromFragments(fragFiles []string) error {
 		switch frag.Operation {
 		case mima.Insert: // already proccess above
 		case mima.Update:
-			if item.UpdateFrom(frag) {
-				db.allItems = append(db.allItems, item)
-				db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
+			if item.UpdateFromFrag(frag) {
+				db.moveToEnd(i)
 			}
 		case mima.SoftDelete:
 			item.Delete()
 		case mima.UnDelete:
 			item.UnDelete()
 		case mima.DeleteForever:
-			if _, err := db.deleteByID(item.ID); err != nil {
-				return err
-			}
+			db.deleteByIndex(i)
 		}
 	}
 	return nil
 }
 
-func (db *DB) deleteByID(id string) (*Mima, error) {
-	i, m, err := db.GetByID(id)
-	if err != nil {
-		return nil, err
-	}
+func (db *DB) moveToEnd(i int) {
+	item := db.allItems[i]
 	db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
-	return m, nil
+	db.allItems = append(db.allItems, item)
 }
 
-func (db *DB) DeleteForeverByID(id string) error {
-	m, err := db.deleteByID(id)
-	if err != nil {
-		return err
-	}
-	return db.encryptWriteFragment(m, mima.DeleteForever)
+func (db *DB) deleteByIndex(i int) {
+	db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
 }
+
+// func (db *DB) deleteByID(id string) (*Mima, error) {
+// 	i, m, err := db.GetByID(id)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
+// 	return m, nil
+// }
+//
+// func (db *DB) DeleteForeverByID(id string) error {
+// 	m, err := db.deleteByID(id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return db.encryptWriteFragment(m, mima.DeleteForever)
+// }
 
 func (db *DB) readAndDecrypt(filePath string) (*Mima, error) {
 	blob, err := ioutil.ReadFile(filePath)
@@ -168,6 +201,10 @@ func (db *DB) readAndDecrypt(filePath string) (*Mima, error) {
 
 func (db *DB) getFragments() ([]string, error) {
 	return util.GetPathsByExt(db.Directory, fragmentExt)
+}
+
+func (db *DB) getTarPaths() ([]string, error) {
+	return util.GetPathsByExt(db.Directory, tarballExt)
 }
 
 func (db *DB) Reset() {
@@ -289,6 +326,24 @@ func (db *DB) Insert(m *Mima) error {
 	}
 	db.allItems = append(db.allItems, m)
 	return db.encryptWriteFragment(m, mima.Insert)
+}
+
+func (db *DB) Update(form *EditForm) error {
+	if form.Title == "" {
+		return errTitleEmpty
+	}
+	i, m, err := db.GetByID(form.ID)
+	if err != nil {
+		return err
+	}
+	changeIndex, writeFrag := m.UpdateFromForm(form)
+	if changeIndex {
+		db.moveToEnd(i)
+	}
+	if writeFrag {
+		return db.encryptWriteFragment(m, mima.Update)
+	}
+	return nil
 }
 
 func (db *DB) encryptWriteFragment(m *Mima, op Operation) error {

@@ -18,10 +18,12 @@ const (
 	NonceSize   = 24
 	dbName      = "mimaweb.db"
 	fragmentExt = ".frag"
+	tarballExt  = ".tar.gz"
+	maxTarballs = 3
 )
 
 var (
-	errTitleEmpty = errors.New("mima.Title is empty")
+	errTitleEmpty = errors.New("Mima.Title is empty")
 )
 
 type (
@@ -29,6 +31,7 @@ type (
 	SecretKey = [KeySize]byte
 	Mima      = mima.Mima
 	Operation = mima.Operation
+	EditForm  = mima.EditForm
 )
 
 // NewFirstMima create the very first mima, to save a random serect key.

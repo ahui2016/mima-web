@@ -16,7 +16,7 @@ func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
-			// http.MethodGet
+			// http.MethodPost
 			http.Error(w, "Logged Out", 400)
 			return
 		}

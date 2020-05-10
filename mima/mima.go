@@ -20,7 +20,11 @@ type Mima struct {
 	History   []*History
 }
 
-func NewFrom(form *AddForm) *Mima {
+func clone(m Mima) Mima {
+	return m
+}
+
+func NewFrom(form *EditForm) *Mima {
 	now := time.Now().UnixNano()
 	return &Mima{
 		ID:        util.NewID(),
@@ -37,8 +41,41 @@ func NewFrom(form *AddForm) *Mima {
 	}
 }
 
-func clone(m Mima) Mima {
-	return m
+func (m *Mima) UpdateFromForm(form *EditForm) (changeIndex, writeFrag bool) {
+	if m.Alias != form.Alias {
+		m.Alias = form.Alias
+		writeFrag = true
+	}
+	if m.noChangeFrom(form) {
+		return
+	}
+
+	updatedAt := time.Now().UnixNano()
+	m.makeHistory(updatedAt)
+
+	m.Title = form.Title
+	m.Username = form.Username
+	m.Password = form.Password
+	m.Notes = form.Notes
+	m.UpdatedAt = updatedAt
+	return true, true
+}
+
+func (m *Mima) makeHistory(updatedAt int64) {
+	h := &History{
+		Title:     m.Title,
+		Username:  m.Username,
+		Password:  m.Password,
+		Notes:     m.Notes,
+		Timestamp: updatedAt,
+	}
+	m.History = append(m.History, h)
+}
+
+func (m *Mima) noChangeFrom(form *EditForm) bool {
+	s1 := m.Title + m.Username + m.Password + m.Notes
+	s2 := form.Title + form.Username + form.Password + form.Notes
+	return s1 == s2
 }
 
 func (m *Mima) HideSecrets() *Mima {
@@ -51,8 +88,8 @@ func (m *Mima) HideSecrets() *Mima {
 	return &m2
 }
 
-// UpdateFrom updates m when fragment.Operation is Update.
-func (m *Mima) UpdateFrom(fragment *Mima) (changeIndex bool) {
+// UpdateFromFrag updates m when fragment.Operation is Update.
+func (m *Mima) UpdateFromFrag(fragment *Mima) (changeIndex bool) {
 	m.Alias = fragment.Alias
 	m.History = fragment.History
 	if m.UpdatedAt == fragment.UpdatedAt {
@@ -87,8 +124,10 @@ type History struct {
 	Timestamp int64
 }
 
-type AddForm struct {
+type EditForm struct {
+	ID       string
 	Title    string
+	Alias    string
 	Username string
 	Password string
 	Notes    string

@@ -24,6 +24,7 @@ func main() {
 	http.HandleFunc("/api/add", checkLogin(addHandler))
 	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
 	http.HandleFunc("/edit", checkLogin(editPage))
+	http.HandleFunc("/api/edit", checkLogin(editHandler))
 	http.HandleFunc("/api/item", checkLogin(getItemHandler))
 
 	addr := "0.0.0.0:8080"
@@ -94,7 +95,7 @@ func addPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func addHandler(w http.ResponseWriter, r *http.Request) {
-	form := &mima.AddForm{
+	form := &mima.EditForm{
 		Title:    strings.TrimSpace(r.FormValue("title")),
 		Username: strings.TrimSpace(r.FormValue("username")),
 		Password: r.FormValue("password"),
@@ -105,6 +106,17 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprint(w, m.ID)
+}
+
+func editHandler(w http.ResponseWriter, r *http.Request) {
+	form := &mima.EditForm{
+		ID:       r.FormValue("id"),
+		Title:    strings.TrimSpace(r.FormValue("title")),
+		Username: strings.TrimSpace(r.FormValue("username")),
+		Password: r.FormValue("password"),
+		Notes:    strings.TrimSpace(r.FormValue("notes")),
+	}
+	checkErr(w, db.Update(form), 400)
 }
 
 func randomPassword(w http.ResponseWriter, r *http.Request) {
