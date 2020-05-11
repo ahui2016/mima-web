@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"time"
 
 	"github.com/ahui2016/mima-web/mima"
 	"github.com/ahui2016/mima-web/util"
@@ -40,7 +39,7 @@ func newFirstMima() *Mima {
 	key := randomKey()
 	m.Username = RandomString64()
 	m.Password = util.Base64Encode(key[:])
-	m.CreatedAt = time.Now().UnixNano()
+	m.CreatedAt = util.TimeNow()
 	return m
 }
 

@@ -42,18 +42,46 @@
         <p><button id="submit">Submit</button></p>
     </form>
 
+    <div id="history" hidden>
+        <p>History</p>
+        <hr>
+        <ul id="item-list">
+            <template id="item-tmpl">
+                <li>
+                    <div>
+                        <strong class="Title"></strong>
+                        <span class="TitleButton">
+                            <span class="DeleteButton InlineButton">delete</span>
+                            <span class="DelForeverButton" hidden>delete forever</span>
+                        </span>
+                        <br>
+                        <span class="DateTime"></span>
+                        <br>
+                        <span class="Username"></span>
+                        <span class="Password"></span>
+                        <span class="Notes"></span>
+                    </div>
+                </li>
+            </template>
+        </ul>
+    </div>
+
     <script>
         let errorElem = document.querySelector('#ErrorMessage');
         let okElem = document.querySelector('#ok');
         let ok_a_elem = document.querySelector('#ok>a');
         let formElem = document.querySelector('form');
+        let submitBtn = document.querySelector('#submit');
+        let historyElem = document.querySelector('#history');
+        let itemListElem = document.querySelector('#item-list');
+        let itemTmplElem = document.querySelector('#item-tmpl');
+
         let titleElem = document.querySelector('#title');
         let aliasElem = document.querySelector('#alias');
         let userElem = document.querySelector('#username');
         let passElem = document.querySelector('#password');
         let colorPassElem = document.querySelector('#colorPassword');
         let notesElem = document.querySelector('#notes');
-        let submitBtn = document.querySelector('#submit');
 
         // set length
         const textFieldWidth = 300;
@@ -85,11 +113,68 @@
                     passElem.value = mima.Password;
                     notesElem.value = mima.Notes;
                     update_color_password();
+                    fillHistory(mima);
                 } else {
                     errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
                 }
             }
             xhr.send(form);
+        }
+
+        function fillHistory(mima) {
+            if (mima.History == null || mima.History.length == 0) {
+                return
+            }
+            historyElem.removeAttribute('hidden');
+            for (let h_item of mima.History) {
+                let itemNode = itemTmplElem.content.cloneNode(true);
+                let liElem = itemNode.querySelector('li');
+                let itemDiv = itemNode.querySelector('div');
+                let titleElem = itemDiv.querySelector('.Title');
+                let delBtnElem = itemDiv.querySelector('.DeleteButton');
+                let delForeverBtnElem = itemDiv.querySelector('.DelForeverButton');
+                let datetimeElem = itemDiv.querySelector('.DateTime');
+                let userElem = itemDiv.querySelector('.Username');
+                let passwordElem = itemDiv.querySelector('.Password');
+                let notesElem = itemDiv.querySelector('.Notes');
+
+                titleElem.innerText = h_item.Title;
+                let datetime = new Date(h_item.DateTime);
+                datetimeElem.innerText = `DateTime: ${datetime}`;
+                userElem.innerText = `Username: ${h_item.Username}`;
+                passwordElem.innerText = `Password: ${h_item.Password}`;
+                notesElem.innerText = `Notes: ${h_item.Notes}`;
+
+                delBtnElem.addEventListener('click', function() {
+                    delBtnElem.setAttribute('hidden', '');
+                    delForeverBtnElem.removeAttribute('hidden');
+                });
+                delForeverBtnElem.addEventListener('click', function() {
+                    delForeverBtnElem.setAttribute('hidden', '');
+
+                    let form = new FormData();
+                    form.append('id', id);
+                    form.append('datetime', h_item.DateTime);
+
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'api/delete-history');
+                    xhr.onerror = function () {
+                        window.alert('An error occurred during the transaction');
+                    }
+                    xhr.onload = function () {
+                        if (this.status == 200) {
+                            liElem.setAttribute('hidden', '');
+                        } else {
+                            window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                        }
+                    }
+                    xhr.addEventListener('loadend', function(){
+                        delForeverBtnElem.removeAttribute('hidden');
+                    });
+                    xhr.send(form);
+                });
+                itemListElem.insertBefore(itemNode, itemListElem.firstElementChild);
+            }
         }
 
         function submit(event) {
@@ -103,9 +188,9 @@
             submitBtn.setAttribute('disabled', '');
 
             let form = new FormData();
-            form.append('id", id);
+            form.append('id', id);
             form.append('title', title);
-            form.append('alias', userElem.value);
+            form.append('alias', aliasElem.value);
             form.append('username', userElem.value);
             form.append('password', passElem.value);
             form.append('notes', notesElem.value);
@@ -117,8 +202,9 @@
             }
             xhr.onload = function () {
                 if (this.status == 200) {
-                    formElem.setAttribute('hidden', '');
                     errorElem.setAttribute('hidden', '');
+                    formElem.setAttribute('hidden', '');
+                    historyElem.setAttribute('hidden', '');
                     okElem.removeAttribute('hidden');
                 } else {
                     errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;

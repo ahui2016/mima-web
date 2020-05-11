@@ -23,3 +23,13 @@ function update_color_password () {
     }
     document.querySelector('#colorPassword').innerHTML = pwd_html;
 }
+
+function simpleDate(timestamp) {
+    const date = new Date(timestamp);
+    let year = '' + date.getFullYear(),
+        month = '' + (date.getMonth() + 1),
+        day = '' + date.getDate();
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+    return [year, month, day].join('-');
+}

@@ -1,7 +1,7 @@
 package mima
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/ahui2016/mima-web/util"
 )
@@ -13,9 +13,9 @@ type Mima struct {
 	Username  string
 	Password  string
 	Notes     string
-	CreatedAt int64
-	UpdatedAt int64
-	DeletedAt int64
+	CreatedAt string // ISO8601
+	UpdatedAt string
+	DeletedAt string
 	Operation Operation
 	History   []*History
 }
@@ -25,7 +25,7 @@ func clone(m Mima) Mima {
 }
 
 func NewFrom(form *EditForm) *Mima {
-	now := time.Now().UnixNano()
+	now := util.TimeNow()
 	return &Mima{
 		ID:        util.NewID(),
 		Title:     form.Title,
@@ -35,7 +35,7 @@ func NewFrom(form *EditForm) *Mima {
 		Notes:     form.Notes,
 		CreatedAt: now,
 		UpdatedAt: now,
-		DeletedAt: 0,
+		DeletedAt: "",
 		Operation: 0,
 		History:   nil,
 	}
@@ -50,7 +50,7 @@ func (m *Mima) UpdateFromForm(form *EditForm) (changeIndex, writeFrag bool) {
 		return
 	}
 
-	updatedAt := time.Now().UnixNano()
+	updatedAt := util.TimeNow()
 	m.makeHistory(updatedAt)
 
 	m.Title = form.Title
@@ -61,15 +61,33 @@ func (m *Mima) UpdateFromForm(form *EditForm) (changeIndex, writeFrag bool) {
 	return true, true
 }
 
-func (m *Mima) makeHistory(updatedAt int64) {
+func (m *Mima) makeHistory(updatedAt string) {
 	h := &History{
-		Title:     m.Title,
-		Username:  m.Username,
-		Password:  m.Password,
-		Notes:     m.Notes,
-		Timestamp: updatedAt,
+		Title:    m.Title,
+		Username: m.Username,
+		Password: m.Password,
+		Notes:    m.Notes,
+		DateTime: updatedAt,
 	}
 	m.History = append(m.History, h)
+}
+
+func (m *Mima) DeleteHistory(datetime string) error {
+	if i := m.getHistoryIndex(datetime); i < 0 {
+		return fmt.Errorf("History not found: %s", datetime)
+	} else {
+		m.History = append(m.History[:i], m.History[i+1:]...)
+		return nil
+	}
+}
+
+func (m *Mima) getHistoryIndex(datetime string) int {
+	for i, h := range m.History {
+		if h.DateTime == datetime {
+			return i
+		}
+	}
+	return -1
 }
 
 func (m *Mima) noChangeFrom(form *EditForm) bool {
@@ -105,23 +123,23 @@ func (m *Mima) UpdateFromFrag(fragment *Mima) (changeIndex bool) {
 
 // Delete soft-delete itself.
 func (m *Mima) Delete() {
-	m.DeletedAt = time.Now().UnixNano()
+	m.DeletedAt = util.TimeNow()
 }
 
 func (m *Mima) UnDelete() {
-	m.DeletedAt = 0
+	m.DeletedAt = ""
 }
 
 func (m *Mima) IsDeleted() bool {
-	return m.DeletedAt > 0
+	return m.DeletedAt != ""
 }
 
 type History struct {
-	Title     string
-	Username  string
-	Password  string
-	Notes     string
-	Timestamp int64
+	Title    string
+	Username string
+	Password string
+	Notes    string
+	DateTime string
 }
 
 type EditForm struct {

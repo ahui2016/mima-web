@@ -26,6 +26,7 @@ func main() {
 	http.HandleFunc("/edit", checkLogin(editPage))
 	http.HandleFunc("/api/edit", checkLogin(editHandler))
 	http.HandleFunc("/api/item", checkLogin(getItemHandler))
+	http.HandleFunc("/api/delete-history", checkLogin(deleteHistory))
 
 	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
@@ -35,7 +36,6 @@ func main() {
 func homePage(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
-		log.Print(r.URL.Path)
 		fallthrough
 	case "/home":
 		redirect(w, r, "/index", 302)
@@ -108,23 +108,24 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, m.ID)
 }
 
-func editHandler(w http.ResponseWriter, r *http.Request) {
-	form := &mima.EditForm{
-		ID:       r.FormValue("id"),
-		Title:    strings.TrimSpace(r.FormValue("title")),
-		Username: strings.TrimSpace(r.FormValue("username")),
-		Password: r.FormValue("password"),
-		Notes:    strings.TrimSpace(r.FormValue("notes")),
-	}
-	checkErr(w, db.Update(form), 400)
-}
-
 func randomPassword(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, randomString16())
 }
 
 func editPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["edit"])
+}
+
+func editHandler(w http.ResponseWriter, r *http.Request) {
+	form := &mima.EditForm{
+		ID:       r.FormValue("id"),
+		Title:    strings.TrimSpace(r.FormValue("title")),
+		Alias:    strings.TrimSpace(r.FormValue("alias")),
+		Username: strings.TrimSpace(r.FormValue("username")),
+		Password: r.FormValue("password"),
+		Notes:    strings.TrimSpace(r.FormValue("notes")),
+	}
+	checkErr(w, db.Update(form), 400)
 }
 
 func getItemHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,4 +139,11 @@ func getItemHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprint(w, string(mJSON))
+}
+
+func deleteHistory(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+	datetime := r.FormValue("datetime")
+	log.Println(id, datetime)
+	checkErr(w, db.DeleteHistory(id, datetime), 400)
 }

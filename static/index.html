@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>All - mima</title>
+    <link rel="stylesheet" href="public/style.css">
 </head>
 <body>
     <ul id="item-list">
@@ -38,6 +39,9 @@
         xhr.onload = function () {
             if (this.status == 200) {
                 let allItems = JSON.parse(this.responseText);
+                if (allItems == null) {
+                    return
+                }
                 for (let item of allItems) {
                     let itemNode = itemTmplElem.content.cloneNode(true);
                     let itemDiv = itemNode.querySelector('div');

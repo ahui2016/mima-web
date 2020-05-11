@@ -29,3 +29,9 @@ label {
     text-decoration: underline;
     cursor: pointer;
 }
+
+.DelForeverButton {
+    color: red;
+    text-decoration: underline;
+    cursor: pointer;
+}

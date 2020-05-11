@@ -373,7 +373,6 @@ func (db *DB) encryptFirst(m *Mima) (string, error) {
 
 func (db *DB) writeFragFile(sealed64 string) error {
 	fragPath := filepath.Join(db.Directory, util.TimestampFilename(fragmentExt))
-	log.Print(fragPath)
 	return writeFile(fragPath, sealed64)
 }
 
@@ -407,4 +406,15 @@ func (db *DB) GetByID(id string) (i int, m *Mima, err error) {
 	}
 	err = fmt.Errorf("id: %s not found", id)
 	return
+}
+
+func (db *DB) DeleteHistory(id, datetime string) error {
+	_, m, err := db.GetByID(id)
+	if err != nil {
+		return err
+	}
+	if err := m.DeleteHistory(datetime); err != nil {
+		return err
+	}
+	return db.encryptWriteFragment(m, mima.Update)
 }

@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	ISO8601            = "2006-01-02T15:04:05.999Z"
 	databaseFolderName = "MimaWebDB"
 )
 
@@ -78,4 +79,8 @@ func DeleteFiles(filePaths []string) error {
 		}
 	}
 	return nil
+}
+
+func TimeNow() string {
+	return time.Now().Format(ISO8601)
 }
