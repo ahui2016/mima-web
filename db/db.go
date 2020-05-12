@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/ahui2016/mima-web/mima"
 	"github.com/ahui2016/mima-web/tarball"
@@ -181,14 +182,6 @@ func (db *DB) deleteByIndex(i int) {
 // 	}
 // 	db.allItems = append(db.allItems[:i], db.allItems[i+1:]...)
 // 	return m, nil
-// }
-//
-// func (db *DB) DeleteForeverByID(id string) error {
-// 	m, err := db.deleteByID(id)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return db.encryptWriteFragment(m, mima.DeleteForever)
 // }
 
 func (db *DB) readAndDecrypt(filePath string) (*Mima, error) {
@@ -380,9 +373,6 @@ func (db *DB) writeFragFile(sealed64 string) error {
 // and hides password and notes. Sorted decending by Mima.UpdatedAt.
 // TODO: cache
 func (db *DB) AllItems() (all []*Mima) {
-	if db.Len()-1 == 0 {
-		return
-	}
 	for i := db.Len() - 1; i > 0; i-- {
 		m := db.allItems[i].HideSecrets()
 		if m.IsDeleted() {
@@ -390,6 +380,20 @@ func (db *DB) AllItems() (all []*Mima) {
 		}
 		all = append(all, m)
 	}
+	return
+}
+
+func (db *DB) DeletedItems() (deleted []*Mima) {
+	for i := 1; i < db.Len(); i++ {
+		m := db.allItems[i].HideSecrets()
+		if !m.IsDeleted() {
+			continue
+		}
+		deleted = append(deleted, m)
+	}
+	sort.Slice(deleted, func(i, j int) bool {
+		return deleted[i].DeletedAt > deleted[j].DeletedAt
+	})
 	return
 }
 
@@ -417,4 +421,34 @@ func (db *DB) DeleteHistory(id, datetime string) error {
 		return err
 	}
 	return db.encryptWriteFragment(m, mima.Update)
+}
+
+func (db *DB) RecycleByID(id string) error {
+	_, m, err := db.GetByID(id)
+	if err != nil {
+		return err
+	}
+	m.Delete()
+	return db.encryptWriteFragment(m, mima.SoftDelete)
+}
+
+func (db *DB) RecoverByID(id string) error {
+	_, m, err := db.GetByID(id)
+	if err != nil {
+		return err
+	}
+	if !m.IsDeleted() {
+		return errors.New(id + " not found in recycle bin")
+	}
+	m.UnDelete()
+	return db.encryptWriteFragment(m, mima.UnDelete)
+}
+
+func (db *DB) DeleteForever(id string) error {
+	i, m, err := db.GetByID(id)
+	if err != nil {
+		return err
+	}
+	db.deleteByIndex(i)
+	return db.encryptWriteFragment(m, mima.DeleteForever)
 }

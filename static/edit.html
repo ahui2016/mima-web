@@ -29,7 +29,7 @@
                 onblur="this.value = this.value.trim()">
         </label>
         <label>Password:
-            (<span class="InlineButton" onclick="randomPassword()">random</span>)
+            <span class="InlineButton" onclick="randomPassword()">random</span>
             <input type="text" id="password" class="TextField"
                 oninput="update_color_password()">
             <div id="colorPassword"></div>
@@ -50,10 +50,8 @@
                 <li>
                     <div>
                         <strong class="Title"></strong>
-                        <span class="TitleButton">
-                            <span class="DeleteButton InlineButton">delete</span>
-                            <span class="DelForeverButton" hidden>delete forever</span>
-                        </span>
+                        <span class="DeleteButton InlineButton">delete</span>
+                        <span class="DelForeverButton RedButton" hidden>delete forever</span>
                         <br>
                         <span class="DateTime"></span>
                         <br>
@@ -141,9 +139,15 @@
                 titleElem.innerText = h_item.Title;
                 let datetime = new Date(h_item.DateTime);
                 datetimeElem.innerText = `DateTime: ${datetime}`;
-                userElem.innerText = `Username: ${h_item.Username}`;
-                passwordElem.innerText = `Password: ${h_item.Password}`;
-                notesElem.innerText = `Notes: ${h_item.Notes}`;
+                if (h_item.Username) {
+                    userElem.innerText = `Username: ${h_item.Username}`;
+                }
+                if (h_item.Password) {
+                    passwordElem.innerText = `Password: ${h_item.Password}`;
+                }
+                if (h_item.Notes) {
+                    notesElem.innerText = `Notes: ${h_item.Notes}`;
+                }
 
                 delBtnElem.addEventListener('click', function() {
                     delBtnElem.setAttribute('hidden', '');

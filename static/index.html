@@ -6,15 +6,16 @@
     <link rel="stylesheet" href="public/style.css">
 </head>
 <body>
+    <p id="ErrorMessage"></p>
+
     <ul id="item-list">
         <template id="item-tmpl">
             <li>
                 <div>
                     <strong class="Title"></strong>
-                    <span class="TitleButton">
-                        <a class="EditButton">edit</a>
-                        <a class="DeleteButton">del</a>
-                    </span>
+                    <a class="EditButton InlineButton">edit</a>
+                    <span class="DeleteButton InlineButton">del</span>
+                    <span class="RecycleButton RedButton" hidden>recycle</span>
                     <br>
                     <span class="Alias"></span>
                     <span class="Username"></span>
@@ -44,16 +45,42 @@
                 }
                 for (let item of allItems) {
                     let itemNode = itemTmplElem.content.cloneNode(true);
+                    let liElem = itemNode.querySelector('li');
                     let itemDiv = itemNode.querySelector('div');
                     let titleElem = itemDiv.querySelector('.Title');
                     let editBtnElem = itemDiv.querySelector('.EditButton');
                     let delBtnElem = itemDiv.querySelector('.DeleteButton');
+                    let recycleBtnElem = itemDiv.querySelector('.RecycleButton');
                     let aliasElem = itemDiv.querySelector('.Alias');
                     let userElem = itemDiv.querySelector('.Username');
 
                     titleElem.innerText = item.Title;
                     editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
-                    delBtnElem.setAttribute('href', `delete?id=${item.ID}`);
+                    delBtnElem.addEventListener('click', function() {
+                        delBtnElem.setAttribute('hidden', '');
+                        recycleBtnElem.removeAttribute('hidden');
+                    });
+                    recycleBtnElem.addEventListener('click', function() {
+                        recycleBtnElem.setAttribute('hidden', '');
+                        let form = new FormData();
+                        form.append('id', item.ID);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'api/delete');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
+                        }
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                liElem.setAttribute('hidden', '');
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.addEventListener('loadend', function(){
+                            recycleBtnElem.removeAttribute('hidden');
+                        });
+                        xhr.send(form);
+                    });
                     if (item.Alias) {
                         aliasElem.innerText = `[${item.Alias}]`;
                     }

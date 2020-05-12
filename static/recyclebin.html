@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recycle Bin - mima</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <p id="ErrorMessage"></p>
+
+    <ul id="item-list">
+        <template id="item-tmpl">
+            <li>
+                <div>
+                    <strong class="Title"></strong>
+                    <span class="TitleButtons">
+                        <span class="RecoverButton InlineButton">recover</span>
+                        <span class="ConfirmRecover RedButton" hidden>confirm recover</span>
+                        <span class="DeleteButton InlineButton">delete</span>
+                        <span class="ConfirmDelete RedButton" hidden>confirm delete</span>
+                    </span>
+                    <span class="RecoverOK" hidden>
+                        <span>Recover OK =&gt;</span>
+                        <a class="EditButton">edit</a>
+                    </span>
+                    <br>
+                    <span class="Alias"></span>
+                    <span class="Username"></span>
+                </div>
+            </li>
+        </template>
+    </ul>
+
+    <script>
+    let errorElem = document.querySelector('#ErrorMessage');
+    let itemListElem = document.querySelector('#item-list');
+    let itemTmplElem = document.querySelector('#item-tmpl');
+
+    refillList();
+
+    function refillList() {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', 'api/deleted-items');
+
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                let allItems = JSON.parse(this.responseText);
+                if (allItems == null) {
+                    return
+                }
+                for (let item of allItems) {
+                    let itemNode = itemTmplElem.content.cloneNode(true);
+                    let liElem = itemNode.querySelector('li');
+                    let itemDiv = itemNode.querySelector('div');
+                    let titleElem = itemDiv.querySelector('.Title');
+                    let recoverBtnElem = itemDiv.querySelector('.RecoverButton');
+                    let confirmRecover = itemDiv.querySelector('.ConfirmRecover');
+                    let delBtnElem = itemDiv.querySelector('.DeleteButton');
+                    let confirmDelete = itemDiv.querySelector('.ConfirmDelete');
+                    let aliasElem = itemDiv.querySelector('.Alias');
+                    let userElem = itemDiv.querySelector('.Username');
+                    let titleButtons = itemDiv.querySelector('.TitleButtons');
+                    let recoverOK = itemDiv.querySelector('.RecoverOK');
+                    let editButton = itemDiv.querySelector('.EditButton');
+
+                    titleElem.innerText = item.Title;
+                    editButton.setAttribute('href', `edit?id=${item.ID}`);
+                    recoverBtnElem.addEventListener('click', function() {
+                        recoverBtnElem.setAttribute('hidden', '');
+                        confirmRecover.removeAttribute('hidden');
+                        confirmDelete.setAttribute('hidden', '');
+                        delBtnElem.removeAttribute('hidden');
+                    });
+                    confirmRecover.addEventListener('click', function() {
+                        confirmRecover.setAttribute('hidden', '');
+                        let form = new FormData();
+                        form.append('id', item.ID);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'api/recover');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
+                        }
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                titleButtons.setAttribute('hidden', '');
+                                recoverOK.removeAttribute('hidden');
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.addEventListener('loadend', function(){
+                            confirmRecover.removeAttribute('hidden');
+                        });
+                        xhr.send(form);
+                    });
+                    delBtnElem.addEventListener('click', function() {
+                        delBtnElem.setAttribute('hidden', '');
+                        confirmDelete.removeAttribute('hidden');
+                        confirmRecover.setAttribute('hidden', '');
+                        recoverBtnElem.removeAttribute('hidden');
+                    });
+                    confirmDelete.addEventListener('click', function() {
+                        confirmDelete.setAttribute('hidden', '');
+                        let form = new FormData();
+                        form.append('id', item.ID);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'api/delete-forever');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
+                        }
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                liElem.setAttribute('hidden', '');
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.addEventListener('loadend', function(){
+                            confirmDelete.removeAttribute('hidden');
+                        });
+                        xhr.send(form);
+                    });
+                    if (item.Alias) {
+                        aliasElem.innerText = `[${item.Alias}]`;
+                    }
+                    if (item.Username) {
+                        userElem.innerText = item.Username;
+                    }
+
+                    itemListElem.appendChild(itemNode);
+                }
+            } else {
+                errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+            }
+        }
+        xhr.send();
+    }
+    </script>
+</body>
+</html>

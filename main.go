@@ -27,6 +27,11 @@ func main() {
 	http.HandleFunc("/api/edit", checkLogin(editHandler))
 	http.HandleFunc("/api/item", checkLogin(getItemHandler))
 	http.HandleFunc("/api/delete-history", checkLogin(deleteHistory))
+	http.HandleFunc("/api/delete", checkLogin(deleteHandler))
+	http.HandleFunc("/recyclebin", checkLogin(recyclePage))
+	http.HandleFunc("/api/deleted-items", checkLogin(getDeletedHandler))
+	http.HandleFunc("/api/recover", checkLogin(recoverHandler))
+	http.HandleFunc("/api/delete-forever", checkLogin(deleteForever))
 
 	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
@@ -48,12 +53,24 @@ func indexPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["index"])
 }
 
+func recyclePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["recyclebin"])
+}
+
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
 	allItems, err := json.Marshal(db.AllItems())
 	if checkErr(w, err, 500) {
 		return
 	}
 	fmt.Fprint(w, string(allItems))
+}
+
+func getDeletedHandler(w http.ResponseWriter, r *http.Request) {
+	deleted, err := json.Marshal(db.DeletedItems())
+	if checkErr(w, err, 500) {
+		return
+	}
+	fmt.Fprint(w, string(deleted))
 }
 
 func loginPage(w http.ResponseWriter, r *http.Request) {
@@ -144,6 +161,18 @@ func getItemHandler(w http.ResponseWriter, r *http.Request) {
 func deleteHistory(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	datetime := r.FormValue("datetime")
-	log.Println(id, datetime)
-	checkErr(w, db.DeleteHistory(id, datetime), 400)
+	err := db.DeleteHistory(id, datetime)
+	checkErr(w, err, 400)
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, db.RecycleByID(r.FormValue("id")), 400)
+}
+
+func recoverHandler(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, db.RecoverByID(r.FormValue("id")), 400)
+}
+
+func deleteForever(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, db.DeleteForever(r.FormValue("id")), 400)
 }

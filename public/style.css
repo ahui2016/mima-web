@@ -25,13 +25,21 @@ label {
 }
 
 .InlineButton {
-    color: blue;
-    text-decoration: underline;
+    color: #ddd;
+    text-decoration: none;
     cursor: pointer;
 }
 
-.DelForeverButton {
+.InlineButton:hover {
+    color: blue;
+}
+
+.RedButton {
     color: red;
-    text-decoration: underline;
+    text-decoration: none;
     cursor: pointer;
+}
+
+.RecoverOK {
+    color: blue;
 }
