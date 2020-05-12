@@ -18,11 +18,13 @@ import (
 )
 
 type DB struct {
-	allItems  []*Mima
-	userKey   *SecretKey
-	key       *SecretKey
-	Directory string
-	FullPath  string
+	allItems     []*Mima
+	homeCache    []*Mima
+	recycleCache []*Mima
+	userKey      *SecretKey
+	key          *SecretKey
+	Directory    string
+	FullPath     string
 }
 
 func NewDB(directory string) *DB {
@@ -369,10 +371,7 @@ func (db *DB) writeFragFile(sealed64 string) error {
 	return writeFile(fragPath, sealed64)
 }
 
-// AllItems return all items except the very first item and soft-deleted items,
-// and hides password and notes. Sorted decending by Mima.UpdatedAt.
-// TODO: cache
-func (db *DB) AllItems() (all []*Mima) {
+func (db *DB) updateHomeCache() (all []*Mima) {
 	for i := db.Len() - 1; i > 0; i-- {
 		m := db.allItems[i].HideSecrets()
 		if m.IsDeleted() {
@@ -451,4 +450,20 @@ func (db *DB) DeleteForever(id string) error {
 	}
 	db.deleteByIndex(i)
 	return db.encryptWriteFragment(m, mima.DeleteForever)
+}
+
+func (db *DB) GetByAlias(alias string) (mimas []*Mima) {
+	if alias == "" {
+		return
+	}
+	for i := 1; i < db.Len(); i++ {
+		m := db.allItems[i]
+		if mima.IsDeleted() {
+			continue
+		}
+		if mima.Alias == alias {
+			mimas = append(mimas, mima)
+		}
+	}
+	return
 }

@@ -32,6 +32,8 @@ func main() {
 	http.HandleFunc("/api/deleted-items", checkLogin(getDeletedHandler))
 	http.HandleFunc("/api/recover", checkLogin(recoverHandler))
 	http.HandleFunc("/api/delete-forever", checkLogin(deleteForever))
+	http.HandleFunc("/search", checkLogin(searchPage))
+	http.HandleFunc("/api/search", checkLogin(searchHandler))
 
 	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
@@ -58,7 +60,7 @@ func recyclePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
-	allItems, err := json.Marshal(db.AllItems())
+	allItems, err := json.Marshal(db.homeCache)
 	if checkErr(w, err, 500) {
 		return
 	}
@@ -175,4 +177,16 @@ func recoverHandler(w http.ResponseWriter, r *http.Request) {
 
 func deleteForever(w http.ResponseWriter, r *http.Request) {
 	checkErr(w, db.DeleteForever(r.FormValue("id")), 400)
+}
+
+func searchPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["search"])
+}
+
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	alias := strings.TrimSpace(r.FormValue("alias"))
+	if alias == "" {
+		http.Error(w, "search text is empty", 400)
+		return
+	}
 }

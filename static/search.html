@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search - mima</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <h2>Search for Alias - mima</h2>
+
+    <form autocomplete="off">
+        <input type="text" id="search" autofocus required/>
+        <input id="submit" type="submit" value="search" />
+    </form>
+
+    <p id="SearchResult"></p>
+
+    <template id="item-tmpl">
+        <li>
+            <div>
+                <strong class="Title"></strong>
+                <a class="EditButton InlineButton">edit</a>
+                <span class="DeleteButton InlineButton">del</span>
+                <span class="RecycleButton RedButton" hidden>recycle</span>
+                <br>
+                <span class="Alias"></span>
+                <span class="Username"></span>
+            </div>
+        </li>
+    </template>
+
+    <ul id="item-list">
+    </ul>
+
+    <script>
+    let searchElem = document.querySelector('#search');
+    let submitBtn = document.querySelector('#submit');
+    let searchResult = document.querySelector('#SearchResult');
+    let itemListElem = document.querySelector('#item-list');
+    let itemTmplElem = document.querySelector('#item-tmpl');
+
+    function submit(event) {
+        event.preventDefault();
+        submitBtn.setAttribute('disabled', '');
+        itemListElem.innerHTML = "";
+        searchResult.innerText = "";
+
+        let form = new FormData();
+        form.append('alias', searchElem.value);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api/search');
+
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                let resultList = JSON.parse(this.responseText);
+                if (resultList) {
+                    refillList(resultList)
+                } else {
+                    searchResult.innerText = `Not Found: ${searchElem.value}`;
+                }
+            }
+            else {
+                searchResult.innerText = `Error: ${this.status} ${this.statusText} ${this.response}`;
+            }
+        }
+        xhr.addEventListener('loadend', function(){
+            submitBtn.removeAttribute('disabled');
+            searchElem.focus();
+        });
+
+        xhr.send(form);
+    }
+    formElem.addEventListener('submit', submit);
+
+    function refillList(resultList) {
+        for (let item of resultList) {
+            let itemNode = itemTmplElem.content.cloneNode(true);
+            let liElem = itemNode.querySelector('li');
+            let itemDiv = itemNode.querySelector('div');
+            let titleElem = itemDiv.querySelector('.Title');
+            let editBtnElem = itemDiv.querySelector('.EditButton');
+            let delBtnElem = itemDiv.querySelector('.DeleteButton');
+            let recycleBtnElem = itemDiv.querySelector('.RecycleButton');
+            let aliasElem = itemDiv.querySelector('.Alias');
+            let userElem = itemDiv.querySelector('.Username');
+
+            titleElem.innerText = item.Title;
+            editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
+            delBtnElem.addEventListener('click', function() {
+                delBtnElem.setAttribute('hidden', '');
+                recycleBtnElem.removeAttribute('hidden');
+            });
+            recycleBtnElem.addEventListener('click', function() {
+                recycleBtnElem.setAttribute('hidden', '');
+                let form = new FormData();
+                form.append('id', item.ID);
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', 'api/delete');
+                xhr.onerror = function () {
+                    window.alert('An error occurred during the transaction');
+                }
+                xhr.onload = function () {
+                    if (this.status == 200) {
+                        liElem.setAttribute('hidden', '');
+                    } else {
+                        window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                    }
+                }
+                xhr.addEventListener('loadend', function(){
+                    recycleBtnElem.removeAttribute('hidden');
+                });
+                xhr.send(form);
+            });
+            if (item.Alias) {
+                aliasElem.innerText = `[${item.Alias}]`;
+            }
+            if (item.Username) {
+                userElem.innerText = item.Username;
+            }
+
+            itemListElem.appendChild(itemNode);
+        }
+    }
+    </script>
+</body>
+</html>
