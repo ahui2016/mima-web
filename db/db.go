@@ -469,8 +469,8 @@ func (db *DB) GetByAlias(alias string) (items []*Mima) {
 	if alias == "" {
 		return
 	}
-	for i := 1; i < db.Len(); i++ {
-		m := db.allItems[i]
+	for i := 1; i < len(db.HomeCache); i++ {
+		m := db.HomeCache[i]
 		if !m.IsDeleted() && m.Alias == alias {
 			items = append(items, m)
 		}

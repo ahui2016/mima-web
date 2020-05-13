@@ -45,7 +45,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	case "/":
 		fallthrough
 	case "/home":
-		redirect(w, r, "/index", 302)
+		redirect(w, r, "/search", 302)
 	default:
 		http.NotFound(w, r)
 	}
@@ -189,4 +189,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "search text is empty", 400)
 		return
 	}
+	items, err := json.Marshal(db.GetByAlias(alias))
+	if checkErr(w, err, 500) {
+		return
+	}
+	fmt.Fprint(w, string(items))
 }
