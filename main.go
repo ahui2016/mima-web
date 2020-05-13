@@ -60,7 +60,7 @@ func recyclePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
-	allItems, err := json.Marshal(db.homeCache)
+	allItems, err := json.Marshal(db.HomeCache)
 	if checkErr(w, err, 500) {
 		return
 	}
@@ -68,7 +68,7 @@ func getAllHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDeletedHandler(w http.ResponseWriter, r *http.Request) {
-	deleted, err := json.Marshal(db.DeletedItems())
+	deleted, err := json.Marshal(db.RecycleCache)
 	if checkErr(w, err, 500) {
 		return
 	}

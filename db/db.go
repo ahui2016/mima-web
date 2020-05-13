@@ -19,8 +19,8 @@ import (
 
 type DB struct {
 	allItems     []*Mima
-	homeCache    []*Mima
-	recycleCache []*Mima
+	HomeCache    []*Mima
+	RecycleCache []*Mima
 	userKey      *SecretKey
 	key          *SecretKey
 	Directory    string
@@ -75,6 +75,8 @@ func (db *DB) Init(password string) error {
 		return err
 	}
 	if len(fragFiles) == 0 {
+		db.updateHomeCache()
+		db.updateRecycleCache()
 		return nil
 	}
 	filesToBackup := append(fragFiles, db.FullPath)
@@ -164,6 +166,8 @@ func (db *DB) updateFromFragments(fragFiles []string) error {
 			db.deleteByIndex(i)
 		}
 	}
+	db.updateHomeCache()
+	db.updateRecycleCache()
 	return nil
 }
 
@@ -204,6 +208,8 @@ func (db *DB) getTarPaths() ([]string, error) {
 
 func (db *DB) Reset() {
 	db.allItems = nil
+	db.HomeCache = nil
+	db.RecycleCache = nil
 	db.userKey = nil
 	db.key = nil
 }
@@ -320,6 +326,7 @@ func (db *DB) Insert(m *Mima) error {
 		return errTitleEmpty
 	}
 	db.allItems = append(db.allItems, m)
+	db.addHomeCache(m)
 	return db.encryptWriteFragment(m, mima.Insert)
 }
 
@@ -335,6 +342,7 @@ func (db *DB) Update(form *EditForm) error {
 	if changeIndex {
 		db.moveToEnd(i)
 	}
+	db.updateHomeCache()
 	if writeFrag {
 		return db.encryptWriteFragment(m, mima.Update)
 	}
@@ -371,29 +379,31 @@ func (db *DB) writeFragFile(sealed64 string) error {
 	return writeFile(fragPath, sealed64)
 }
 
-func (db *DB) updateHomeCache() (all []*Mima) {
+func (db *DB) updateHomeCache() {
+	db.HomeCache = nil
+	for i := db.Len() - 1; i > 0; i-- {
+		m := db.allItems[i].HideSecrets()
+		if !m.IsDeleted() {
+			db.HomeCache = append(db.HomeCache, m)
+		}
+	}
+}
+
+func (db *DB) updateRecycleCache() {
+	db.RecycleCache = nil
 	for i := db.Len() - 1; i > 0; i-- {
 		m := db.allItems[i].HideSecrets()
 		if m.IsDeleted() {
-			continue
+			db.RecycleCache = append(db.RecycleCache, m)
 		}
-		all = append(all, m)
 	}
-	return
+	sort.Slice(db.RecycleCache, func(i, j int) bool {
+		return db.RecycleCache[i].DeletedAt > db.RecycleCache[j].DeletedAt
+	})
 }
 
-func (db *DB) DeletedItems() (deleted []*Mima) {
-	for i := 1; i < db.Len(); i++ {
-		m := db.allItems[i].HideSecrets()
-		if !m.IsDeleted() {
-			continue
-		}
-		deleted = append(deleted, m)
-	}
-	sort.Slice(deleted, func(i, j int) bool {
-		return deleted[i].DeletedAt > deleted[j].DeletedAt
-	})
-	return
+func (db *DB) addHomeCache(m *Mima) {
+	db.HomeCache = append([]*Mima{m.HideSecrets()}, db.HomeCache...)
 }
 
 func (db *DB) Len() int {
@@ -428,6 +438,7 @@ func (db *DB) RecycleByID(id string) error {
 		return err
 	}
 	m.Delete()
+	db.updateRecycleCache()
 	return db.encryptWriteFragment(m, mima.SoftDelete)
 }
 
@@ -440,6 +451,7 @@ func (db *DB) RecoverByID(id string) error {
 		return errors.New(id + " not found in recycle bin")
 	}
 	m.UnDelete()
+	db.updateRecycleCache()
 	return db.encryptWriteFragment(m, mima.UnDelete)
 }
 
@@ -449,20 +461,18 @@ func (db *DB) DeleteForever(id string) error {
 		return err
 	}
 	db.deleteByIndex(i)
+	db.updateRecycleCache()
 	return db.encryptWriteFragment(m, mima.DeleteForever)
 }
 
-func (db *DB) GetByAlias(alias string) (mimas []*Mima) {
+func (db *DB) GetByAlias(alias string) (items []*Mima) {
 	if alias == "" {
 		return
 	}
 	for i := 1; i < db.Len(); i++ {
 		m := db.allItems[i]
-		if mima.IsDeleted() {
-			continue
-		}
-		if mima.Alias == alias {
-			mimas = append(mimas, mima)
+		if !m.IsDeleted() && m.Alias == alias {
+			items = append(items, m)
 		}
 	}
 	return
