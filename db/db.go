@@ -438,6 +438,7 @@ func (db *DB) RecycleByID(id string) error {
 		return err
 	}
 	m.Delete()
+	db.updateHomeCache()
 	db.updateRecycleCache()
 	return db.encryptWriteFragment(m, mima.SoftDelete)
 }
