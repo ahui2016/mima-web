@@ -20,6 +20,7 @@ func main() {
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
+	http.HandleFunc("/logout", checkLogin(logoutHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
 	http.HandleFunc("/api/add", checkLogin(addHandler))
 	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
@@ -34,6 +35,7 @@ func main() {
 	http.HandleFunc("/api/delete-forever", checkLogin(deleteForever))
 	http.HandleFunc("/search", checkLogin(searchPage))
 	http.HandleFunc("/api/search", checkLogin(searchHandler))
+	http.HandleFunc("/api/get-password", checkLogin(getPassword))
 
 	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
@@ -107,6 +109,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// db is ready and the password is correct.
 	passwordTry = 0
 	sessionManager.Add(w, util.NewID())
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	db.Reset()
+	fmt.Fprint(w, "Logged out.")
 }
 
 func addPage(w http.ResponseWriter, r *http.Request) {
@@ -194,4 +201,13 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprint(w, string(items))
+}
+
+func getPassword(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+	_, m, err := db.GetByID(id)
+	if checkErr(w, err, 400) {
+		return
+	}
+	fmt.Fprint(w, m.Password)
 }

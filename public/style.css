@@ -7,6 +7,10 @@ label {
     margin-top: 1em;
 }
 
+li {
+    margin-top: 1em;
+}
+
 #ErrorMessage {
     color: white;
     background-color: red;

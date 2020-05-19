@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>All - mima</title>
+    <title>Index - mima</title>
     <link rel="stylesheet" href="public/style.css">
 </head>
 <body>
+    <p><a href="search">search</a> | <a href="add">add</a> | <a href="recyclebin">recycle bin</a></p>
+
+    <h2>Index - mima</h2>
+
     <p id="ErrorMessage"></p>
 
     <ul id="item-list">
@@ -13,6 +17,8 @@
             <li>
                 <div>
                     <strong class="Title"></strong>
+                    <span class="UserCopyBtn InlineButton" hidden>user</span>
+                    <span class="PassCopyBtn InlineButton" hidden>pass</span>
                     <a class="EditButton InlineButton">edit</a>
                     <span class="DeleteButton InlineButton">del</span>
                     <span class="RecycleButton RedButton" hidden>recycle</span>
@@ -24,9 +30,12 @@
         </template>
     </ul>
 
+    <input type="text" id="textForCopy" hidden>
+
     <script>
     let itemListElem = document.querySelector('#item-list');
     let itemTmplElem = document.querySelector('#item-tmpl');
+    let textForCopy = document.querySelector('#textForCopy');
 
     refillList();
 
@@ -48,6 +57,8 @@
                     let liElem = itemNode.querySelector('li');
                     let itemDiv = itemNode.querySelector('div');
                     let titleElem = itemDiv.querySelector('.Title');
+                    let userCopyBtn = itemDiv.querySelector('.UserCopyBtn');
+                    let passCopyBtn = itemDiv.querySelector('.PassCopyBtn');
                     let editBtnElem = itemDiv.querySelector('.EditButton');
                     let delBtnElem = itemDiv.querySelector('.DeleteButton');
                     let recycleBtnElem = itemDiv.querySelector('.RecycleButton');
@@ -56,6 +67,41 @@
 
                     titleElem.innerText = item.Title;
                     editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
+                    if (item.Username) {
+                        userCopyBtn.removeAttribute('hidden');
+                        userCopyBtn.addEventListener('click', function() {
+                            textForCopy.removeAttribute('hidden');
+                            textForCopy.value = item.Username;
+                            textForCopy.select();
+                            document.execCommand('copy');
+                            textForCopy.setAttribute('hidden', '');
+                        });
+                    }
+                    if (item.Password) {
+                        passCopyBtn.removeAttribute('hidden');
+                        passCopyBtn.addEventListener('click', function() {
+                            textForCopy.removeAttribute('hidden');
+
+                            let form = new FormData();
+                            form.append('id', item.ID);
+                            let xhr = new XMLHttpRequest();
+                            xhr.open('POST', 'api/get-password');
+                            xhr.onerror = function () {
+                                window.alert('An error occurred during the transaction');
+                            }
+                            xhr.onload = function () {
+                                if (this.status == 200) {
+                                    textForCopy.value = this.responseText;
+                                    textForCopy.select();
+                                    document.execCommand('copy');
+                                    textForCopy.setAttribute('hidden', '');
+                                } else {
+                                    window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                                }
+                            }
+                            xhr.send(form);
+                        });
+                    }
                     delBtnElem.addEventListener('click', function() {
                         delBtnElem.setAttribute('hidden', '');
                         recycleBtnElem.removeAttribute('hidden');
