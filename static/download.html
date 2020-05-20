@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download - mima</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <p><a href="home">home</a></p>
+
+    <h2>Download a backup</h2>
+
+    <div id="start-guide">
+        <p>Click the button below to generate a backup file of the database.</p>
+        <p><button id="generate-button">generate</button></p>
+    </div>
+
+    <p id="ErrorMessage"></p>
+
+    <div id="backup-file" hidden>
+        <p>Right click the link below and save as a file.</p>
+        <p><a href="public/mimaweb.db.bak">mimaweb.db.bak</a></p>
+        <p>
+            After download, click the button below to reset.<br>
+            (otherwise, everyone can download the file without login)
+        </p>
+        <p><button id="reset">reset</button></p>
+    </div>
+
+    <script>
+    let startGuide = document.querySelector('#start-guide');
+    let genButton = document.querySelector('#generate-button');
+    let bakFile = document.querySelector('#backup-file');
+    let errorElem = document.querySelector('#ErrorMessage');
+    let resetButton = document.querySelector('#reset');
+
+    genButton.addEventListener('click', function() {
+        genButton.setAttribute('disabled', '');
+        let form = new FormData();
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api/generate-backup');
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                errorElem.setAttribute('hidden', '');
+                startGuide.setAttribute('hidden', '');
+                bakFile.removeAttribute('hidden');
+            } else {
+                errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+            }
+        }
+        xhr.addEventListener('loadend', function(){
+            genButton.removeAttribute('disabled');
+        });
+        xhr.send(form);
+    });
+    </script>
+</body>
+</html>

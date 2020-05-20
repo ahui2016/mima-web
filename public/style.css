@@ -11,6 +11,10 @@ li {
     margin-top: 1em;
 }
 
+.TopBanner {
+    text-align: right;
+}
+
 #ErrorMessage {
     color: white;
     background-color: red;

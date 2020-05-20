@@ -119,7 +119,11 @@ func (db *DB) backupToTar(files []string) error {
 }
 
 func (db *DB) rewriteFullPath() error {
-	dbFile, err := os.Create(db.FullPath)
+	return db.WriteDatabase(db.FullPath)
+}
+
+func (db *DB) WriteDatabase(filePath string) error {
+	dbFile, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}

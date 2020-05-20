@@ -18,6 +18,7 @@ const (
 	staticFolder   = "static"
 	maxAge         = 60 * 30 // seconds
 	passwordMaxTry = 3
+	backupFilePath = "public/mimaweb.db.bak"
 )
 
 var (

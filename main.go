@@ -36,6 +36,8 @@ func main() {
 	http.HandleFunc("/search", checkLogin(searchPage))
 	http.HandleFunc("/api/search", checkLogin(searchHandler))
 	http.HandleFunc("/api/get-password", checkLogin(getPassword))
+	http.HandleFunc("/download", checkLogin(downloadPage))
+	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 
 	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
@@ -210,4 +212,12 @@ func getPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprint(w, m.Password)
+}
+
+func downloadPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["download"])
+}
+
+func generateBackup(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, db.WriteDatabase(backupFilePath), 500)
 }
