@@ -34,13 +34,6 @@ func NewDB(directory string) *DB {
 	}
 }
 
-func (db *DB) IsEmpty() bool {
-	if len(db.allItems) > 0 {
-		return false
-	}
-	return true
-}
-
 func (db *DB) Create(password string) {
 	if db.fullPathExist() {
 		log.Fatalf("%s already exists", db.FullPath)
@@ -55,6 +48,18 @@ func (db *DB) Create(password string) {
 	if err := writeFile(db.FullPath, sealed64); err != nil {
 		panic(err)
 	}
+}
+
+func (db *DB) ChangePassword(newPassword string) error {
+	if !db.IsReady() {
+		errors.New("the database has not initialize yet")
+	}
+	if err := db.backupToTar([]string{db.FullPath}); err != nil {
+		return err
+	}
+	newUserKey := sha256.Sum256([]byte(newPassword))
+	db.userKey = &newUserKey
+	return db.rewriteFullPath()
 }
 
 func (db *DB) Init(password string) error {
@@ -220,10 +225,14 @@ func (db *DB) CheckPassword(password string) bool {
 }
 
 func (db *DB) IsReady() bool {
+	return !db.IsEmpty()
+}
+
+func (db *DB) IsEmpty() bool {
 	if len(db.allItems) > 0 {
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 func (db *DB) setKeys(password string) error {
@@ -452,6 +461,7 @@ func (db *DB) RecoverByID(id string) error {
 		return errors.New(id + " not found in recycle bin")
 	}
 	m.UnDelete()
+	db.updateHomeCache()
 	db.updateRecycleCache()
 	return db.encryptWriteFragment(m, mima.UnDelete)
 }
