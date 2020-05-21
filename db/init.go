@@ -18,7 +18,7 @@ const (
 	dbName      = "mimaweb.db"
 	fragmentExt = ".frag"
 	tarballExt  = ".tar.gz"
-	maxTarballs = 3
+	maxTarballs = 100
 )
 
 var (

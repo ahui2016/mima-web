@@ -17,7 +17,7 @@ const (
 	prefix         = "/mima"
 	staticFolder   = "static"
 	maxAge         = 60 * 30 // seconds
-	passwordMaxTry = 3
+	passwordMaxTry = 5
 	backupFilePath = "public/mimaweb.db.bak"
 )
 
