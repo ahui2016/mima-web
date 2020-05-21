@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/ahui2016/mima-web/mima"
@@ -38,6 +39,7 @@ func main() {
 	http.HandleFunc("/api/get-password", checkLogin(getPassword))
 	http.HandleFunc("/download", checkLogin(downloadPage))
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
+	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
 
 	addr := "0.0.0.0:8080"
 	fmt.Println(addr)
@@ -220,4 +222,8 @@ func downloadPage(w http.ResponseWriter, r *http.Request) {
 
 func generateBackup(w http.ResponseWriter, r *http.Request) {
 	checkErr(w, db.WriteDatabase(backupFilePath), 500)
+}
+
+func deleteBackup(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, os.Remove(backupFilePath), 500)
 }

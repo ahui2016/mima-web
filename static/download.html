@@ -27,12 +27,15 @@
         <p><button id="reset">reset</button></p>
     </div>
 
+    <p id="ok" hidden>OK.</p>
+
     <script>
     let startGuide = document.querySelector('#start-guide');
     let genButton = document.querySelector('#generate-button');
     let bakFile = document.querySelector('#backup-file');
     let errorElem = document.querySelector('#ErrorMessage');
     let resetButton = document.querySelector('#reset');
+    let okMessage = document.querySelector('#ok');
 
     genButton.addEventListener('click', function() {
         genButton.setAttribute('disabled', '');
@@ -44,7 +47,7 @@
         }
         xhr.onload = function () {
             if (this.status == 200) {
-                errorElem.setAttribute('hidden', '');
+                errorElem.innerText = '';
                 startGuide.setAttribute('hidden', '');
                 bakFile.removeAttribute('hidden');
             } else {
@@ -53,6 +56,29 @@
         }
         xhr.addEventListener('loadend', function(){
             genButton.removeAttribute('disabled');
+        });
+        xhr.send(form);
+    });
+
+    resetButton.addEventListener('click', function() {
+        resetButton.setAttribute('disabled', '');
+        let form = new FormData();
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api/delete-backup');
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                errorElem.setAttribute('hidden', '');
+                bakFile.setAttribute('hidden', '');
+                okMessage.removeAttribute('hidden');
+            } else {
+                errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+            }
+        }
+        xhr.addEventListener('loadend', function(){
+            resetButton.removeAttribute('disabled');
         });
         xhr.send(form);
     });
