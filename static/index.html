@@ -70,8 +70,6 @@
                     let aliasElem = itemDiv.querySelector('.Alias');
                     let userElem = itemDiv.querySelector('.Username');
 
-                    titleElem.innerText = item.Title;
-                    editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
                     if (item.Username) {
                         userCopyBtn.removeAttribute('hidden');
                         userCopyBtn.addEventListener('click', function() {
@@ -85,8 +83,6 @@
                     if (item.Password) {
                         passCopyBtn.removeAttribute('hidden');
                         passCopyBtn.addEventListener('click', function() {
-                            textForCopy.removeAttribute('hidden');
-
                             let form = new FormData();
                             form.append('id', item.ID);
                             let xhr = new XMLHttpRequest();
@@ -96,6 +92,7 @@
                             }
                             xhr.onload = function () {
                                 if (this.status == 200) {
+                                    textForCopy.removeAttribute('hidden');
                                     textForCopy.value = this.responseText;
                                     textForCopy.select();
                                     document.execCommand('copy');
@@ -107,6 +104,9 @@
                             xhr.send(form);
                         });
                     }
+
+                    titleElem.innerText = item.Title;
+                    editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
                     delBtnElem.addEventListener('click', function() {
                         delBtnElem.setAttribute('hidden', '');
                         recycleBtnElem.removeAttribute('hidden');
