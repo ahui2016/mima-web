@@ -11,6 +11,7 @@ import (
 var password = flag.String("password", "", "The master password, required.")
 
 func main() {
+	flag.Parse()
 	if *password == "" {
 		log.Fatal("password is empty")
 	}

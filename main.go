@@ -41,7 +41,7 @@ func main() {
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
 
-	addr := "0.0.0.0:8080"
+	addr := "127.0.0.1:8080"
 	fmt.Println(addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
