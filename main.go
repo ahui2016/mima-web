@@ -117,6 +117,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	db.Reset()
+	sessionManager.DeleteSID(w, r)
 	fmt.Fprint(w, "Logged out.")
 }
 
