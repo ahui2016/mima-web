@@ -15,7 +15,9 @@
 
     <p id="ok" hidden>Edit OK =&gt; <a href="home">home</a></p>
 
-    <form autocomplete="off">
+    <p class="LoadingMessage">Loading...</p>
+
+    <form id="EditForm" autocomplete="off" hidden>
         <label>Title:
             <input type="text" id="title" class="TextField" autofocus required
                 onblur="this.value = this.value.trim()">
@@ -68,7 +70,8 @@
         let errorElem = document.querySelector('#ErrorMessage');
         let okElem = document.querySelector('#ok');
         let ok_a_elem = document.querySelector('#ok>a');
-        let formElem = document.querySelector('form');
+        let loadingElem = document.querySelector('.LoadingMessage');
+        let formElem = document.querySelector('#EditForm');
         let submitBtn = document.querySelector('#submit');
         let historyElem = document.querySelector('#history');
         let itemListElem = document.querySelector('#item-list');
@@ -104,6 +107,9 @@
             }
             xhr.onload = function () {
                 if (this.status == 200) {
+                    formElem.removeAttribute('hidden');
+                    loadingElem.setAttribute('hidden', '');
+
                     let mima = JSON.parse(this.responseText);
                     titleElem.value = mima.Title;
                     aliasElem.value = mima.Alias;

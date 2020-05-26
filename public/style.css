@@ -21,6 +21,10 @@ li {
     font-weight: bold;
 }
 
+.LoadingMessage {
+    color: blue;
+}
+
 .TextField {
     font-size: inherit;
     font-family: inherit;
