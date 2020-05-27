@@ -16,7 +16,7 @@ func main() {
 	fs := http.FileServer(http.Dir("public/"))
 	http.Handle("/public/", http.StripPrefix("/public/", fs))
 
-	http.HandleFunc("/", homePage)
+	http.HandleFunc("/", checkLogin(homePage))
 	http.HandleFunc("/index", checkLogin(indexPage))
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
@@ -51,7 +51,8 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	case "/":
 		fallthrough
 	case "/home":
-		redirect(w, r, "/search", 302)
+		fmt.Fprint(w, htmlFiles["search"])
+		// redirect(w, r, "/search", 303)
 	default:
 		http.NotFound(w, r)
 	}
