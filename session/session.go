@@ -25,6 +25,7 @@ func (manager *Manager) NewSession(sid string) http.Cookie {
 		Path:     "/", // important
 		MaxAge:   manager.maxAge,
 		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
 	}
 }
 
@@ -53,6 +54,7 @@ func (manager *Manager) DeleteSID(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &session)
 }
