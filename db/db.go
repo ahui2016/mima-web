@@ -52,7 +52,7 @@ func (db *DB) Create(password string) {
 
 func (db *DB) ChangePassword(newPassword string) error {
 	if !db.IsReady() {
-		errors.New("the database has not initialize yet")
+		return errors.New("the database has not initialize yet")
 	}
 	if err := db.backupToTar([]string{db.FullPath}); err != nil {
 		return err

@@ -16,7 +16,7 @@ func main() {
 	fs := http.FileServer(http.Dir("public/"))
 	http.Handle("/public/", http.StripPrefix("/public/", fs))
 
-	http.HandleFunc("/", checkLogin(homePage))
+	http.HandleFunc("/", homePage)
 	http.HandleFunc("/index", checkLogin(indexPage))
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
@@ -51,8 +51,8 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	case "/":
 		fallthrough
 	case "/home":
-		fmt.Fprint(w, htmlFiles["search"])
-		// redirect(w, r, "/search", 303)
+		// fmt.Fprint(w, htmlFiles["search"])
+		http.Redirect(w, r, "/search", 302)
 	default:
 		http.NotFound(w, r)
 	}
@@ -103,7 +103,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// if db is ready but it's session has not set.
 	if !db.CheckPassword(password) {
-		passwordTry += 1
+		passwordTry++
 		if checkPasswordTry(w) {
 			return
 		}
