@@ -18,6 +18,7 @@ func main() {
 
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/index", checkLogin(indexPage))
+	http.HandleFunc("/m/index", checkLogin(mIndexPage))
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
@@ -60,6 +61,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["index"])
+}
+
+func mIndexPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["m-index"])
 }
 
 func recyclePage(w http.ResponseWriter, r *http.Request) {
