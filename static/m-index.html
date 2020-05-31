@@ -6,35 +6,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="public/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/bootstrap.min.css">
 
     <title>Index - mima</title>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="public/jquery-3.5.1.slim.min.js"></script>
-    <script src="public/popper.min.js"></script>
-    <script src="public/bootstrap.min.js"></script>
+    <script src="/public/jquery-3.5.1.slim.min.js"></script>
+    <script src="/public/popper.min.js"></script>
+    <script src="/public/bootstrap.min.js"></script>
   </body>
   <div class="container">
 
     <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="nav bar">
         <div class="btn-group mr-2" role="group">
             <a type="button" class="btn btn-outline-dark" href="search">
-                <img src="public/icons/search.svg" alt="search" width="32" height="32" title="search">
+                <img src="/public/icons/search.svg" alt="search" width="32" height="32" data-toggle="tooltip" title="search">
             </a>
             <a type="button" class="btn btn-outline-dark" href="add">
-                <img src="public/icons/file-earmark-plus.svg" alt="add" width="32" height="32" title="add">
+                <img src="/public/icons/file-earmark-plus.svg" alt="add" width="32" height="32" data-toggle="tooltip" title="add">
             </a>
             <a type="button" class="btn btn-outline-dark" href="recyclebin">
-                <img src="public/icons/trash.svg" alt="Recycle Bin" width="32" height="32" title="Recycle Bin">
+                <img src="/public/icons/trash.svg" alt="Recycle Bin" width="32" height="32" data-toggle="tooltip" title="Recycle Bin">
             </a>
         </div>
         <div class="btn-group" role="group">
-            <a type="button" class="btn btn-outline-dark" href="logout">
-                <img src="public/icons/power.svg" alt="logout" width="32" height="32" title="logout">
+            <a type="button" class="btn btn-outline-dark" href="/logout">
+                <img src="/public/icons/power.svg" alt="logout" width="32" height="32" data-toggle="tooltip" title="logout">
             </a>
         </div>
     </div>
-  </div>
+
+    <div id="ErrorMessage" class="alert alert-danger" role="alert"></div>
+
+    <div class="row row-cols-1 row-cols-md-3" id="item-list">
+        <template id="item-tmpl">
+            <div class="col mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted"></h6>
+                        <p class="card-text">Username</p>
+                        <div class="btn-toolbar justify-content-end" role="toolbar">
+                            <div class="btn-group mr-2" role="group">
+                                <button type="button" class="btn btn-outline-light UserCopyBtn" hidden>
+                                    <img src="/public/icons/person-square.svg" alt="user" data-toggle="tooltip" title="copy username">
+                                </button>
+                                <button type="button" class="btn btn-outline-light PassCopyBtn" hidden>
+                                    <img src="/public/icons/lock-fill.svg" alt="pass" data-toggle="tooltip" title="copy password">
+                                </button>
+                                <a type="button" class="btn btn-outline-light EditButton">
+                                    <img src="/public/icons/pencil-square.svg" alt="edit" data-toggle="tooltip" title="edit">
+                                </a>
+                                <button type="button" class="btn btn-outline-light DeleteButton">
+                                    <img src="/public/icons/trash-fill.svg" alt="delete" data-toggle="tooltip" title="delete">
+                                </button>
+                            </div>
+                        </div>
+                      </div>
+                </div>
+              </div>
+        </template>
+    </div>
+
+    <script>
+        let itemListElem = document.querySelector('#item-list');
+        let itemTmplElem = document.querySelector('#item-tmpl');
+
+        refillList();
+
+function refillList() {
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/all-items');
+
+    xhr.onerror = function () {
+        window.alert('An error occurred during the transaction');
+    }
+    xhr.onload = function () {
+        if (this.status == 200) {
+            let allItems = JSON.parse(this.responseText);
+            if (allItems == null) {
+                return
+            }
+            for (let item of allItems) {
+                let itemNode = itemTmplElem.content.cloneNode(true);
+                let titleElem = itemNode.querySelector('.card-title');
+                let aliasElem = itemNode.querySelector('.card-subtitle');
+                let userElem = itemNode.querySelector('.card-text');
+                let userCopyBtn = itemNode.querySelector('.UserCopyBtn');
+                let passCopyBtn = itemNode.querySelector('.PassCopyBtn');
+                let editBtnElem = itemNode.querySelector('.EditButton');
+                let delBtnElem = itemNode.querySelector('.DeleteButton');
+                // let recycleBtnElem = itemNode.querySelector('.RecycleButton');
+
+                if (item.Username) {
+                    userCopyBtn.removeAttribute('hidden');
+                }
+                if (item.Password) {
+                    passCopyBtn.removeAttribute('hidden');
+                }
+                titleElem.innerText = item.Title;
+                if (item.Alias) {
+                    aliasElem.innerText = `[${item.Alias}]`;
+                }
+                if (item.Username) {
+                    userElem.innerText = item.Username;
+                }
+                editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
+                itemListElem.appendChild(itemNode);
+            }
+        }
+    }
+    xhr.send();
+}
+    </script>
+    </div>
   </html>

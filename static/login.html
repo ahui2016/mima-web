@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - mima</title>
-    <link rel="stylesheet" href="public/style.css">
+    <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
     <p id="ErrorMessage"></p>
-    <p id="ok" hidden>Login OK =&gt; <a href="home">home</a></p>
+    <p id="ok" hidden>Login OK =&gt; <a href="/home">home</a></p>
     <div id="no-more-try" hidden>
        <p>No more try.</p>
        <p>Input wrong password too many times.</p>
@@ -37,7 +37,7 @@
             form.append('password', pwElem.value);
 
             let xhr = new XMLHttpRequest();
-            xhr.open('post', 'api/login');
+            xhr.open('post', '/api/login');
 
             xhr.onerror = function () {
                 window.alert('An error occurred during the transaction');
