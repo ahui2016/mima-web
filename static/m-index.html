@@ -17,49 +17,62 @@
     <script src="/public/bootstrap.min.js"></script>
   </body>
   <div class="container">
-
-    <div class="btn-toolbar justify-content-end" role="toolbar" aria-label="nav bar">
-        <div class="btn-group mr-2" role="group">
-            <a type="button" class="btn btn-outline-dark" href="search">
-                <img src="/public/icons/search.svg" alt="search" width="32" height="32" data-toggle="tooltip" title="search">
-            </a>
-            <a type="button" class="btn btn-outline-dark" href="add">
-                <img src="/public/icons/file-earmark-plus.svg" alt="add" width="32" height="32" data-toggle="tooltip" title="add">
-            </a>
-            <a type="button" class="btn btn-outline-dark" href="recyclebin">
-                <img src="/public/icons/trash.svg" alt="Recycle Bin" width="32" height="32" data-toggle="tooltip" title="Recycle Bin">
-            </a>
+    <nav class="navbar navbar-light bg-light mb-3 mt-1">
+        <span class="navbar-brand mb-0 h1">Index</span>
+        <div class="btn-toolbar" role="toolbar" aria-label="nav bar">
+            <div class="btn-group mr-2" role="group">
+                <a type="button" class="btn btn-outline-dark" href="search" data-toggle="tooltip" title="search">
+                    <img src="/public/icons/search.svg" alt="search" style="font-size: 3rem;">
+                </a>
+                <a type="button" class="btn btn-outline-dark" href="add" data-toggle="tooltip" title="add">
+                    <img src="/public/icons/file-earmark-plus.svg" alt="add" style="font-size:3rem;">
+                </a>
+                <a type="button" class="btn btn-outline-dark" href="recyclebin" data-toggle="tooltip" title="Recycle Bin">
+                    <img src="/public/icons/trash.svg" alt="Recycle Bin" style="font-size: 3rem;">
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                <a type="button" class="btn btn-outline-dark" href="/logout" data-toggle="tooltip" title="logout">
+                    <img src="/public/icons/power.svg" alt="logout" style="font-size: 3rem;">
+                </a>
+            </div>
         </div>
-        <div class="btn-group" role="group">
-            <a type="button" class="btn btn-outline-dark" href="/logout">
-                <img src="/public/icons/power.svg" alt="logout" width="32" height="32" data-toggle="tooltip" title="logout">
-            </a>
-        </div>
-    </div>
+    </nav>
 
-    <div id="ErrorMessage" class="alert alert-danger" role="alert"></div>
+    <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
 
     <div class="row row-cols-1 row-cols-md-3" id="item-list">
         <template id="item-tmpl">
             <div class="col mb-4">
                 <div class="card h-100">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Title</h5>
                         <h6 class="card-subtitle mb-2 text-muted"></h6>
                         <p class="card-text">Username</p>
-                        <div class="btn-toolbar justify-content-end" role="toolbar">
+                        <div class="btn-toolbar mt-auto justify-content-end" role="toolbar">
                             <div class="btn-group mr-2" role="group">
-                                <button type="button" class="btn btn-outline-light UserCopyBtn" hidden>
-                                    <img src="/public/icons/person-square.svg" alt="user" data-toggle="tooltip" title="copy username">
+                                <button type="button" class="btn btn-outline-light UserCopyBtn" data-toggle="tooltip" title="copy username" hidden>
+                                    <svg class="bi bi-person-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                        <path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                    </svg>
                                 </button>
-                                <button type="button" class="btn btn-outline-light PassCopyBtn" hidden>
-                                    <img src="/public/icons/lock-fill.svg" alt="pass" data-toggle="tooltip" title="copy password">
+                                <button type="button" class="btn btn-outline-light PassCopyBtn" data-toggle="tooltip" title="copy password" hidden>
+                                    <svg class="bi bi-lock-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="11" height="9" x="2.5" y="7" rx="2"/>
+                                        <path fill-rule="evenodd" d="M4.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>
+                                    </svg>
                                 </button>
-                                <a type="button" class="btn btn-outline-light EditButton">
-                                    <img src="/public/icons/pencil-square.svg" alt="edit" data-toggle="tooltip" title="edit">
+                                <a type="button" class="btn btn-outline-light EditButton" data-toggle="tooltip" title="edit">
+                                    <svg class="bi bi-pencil-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                    </svg>
                                 </a>
-                                <button type="button" class="btn btn-outline-light DeleteButton">
-                                    <img src="/public/icons/trash-fill.svg" alt="delete" data-toggle="tooltip" title="delete">
+                                <button type="button" class="btn btn-outline-light DeleteButton" data-toggle="tooltip" title="delete">
+                                    <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -69,7 +82,14 @@
         </template>
     </div>
 
+    <div class="alert alert-light text-right small">
+        <a href="https://github.com/ahui2016/mima-web">github.com/ahui2016/mima-web</a>
+    </div>
+
     <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         let itemListElem = document.querySelector('#item-list');
         let itemTmplElem = document.querySelector('#item-tmpl');
 
@@ -101,9 +121,11 @@ function refillList() {
 
                 if (item.Username) {
                     userCopyBtn.removeAttribute('hidden');
+                    $(userCopyBtn).tooltip();
                 }
                 if (item.Password) {
                     passCopyBtn.removeAttribute('hidden');
+                    $(passCopyBtn).tooltip();
                 }
                 titleElem.innerText = item.Title;
                 if (item.Alias) {
@@ -113,6 +135,8 @@ function refillList() {
                     userElem.innerText = item.Username;
                 }
                 editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
+                $(editBtnElem).tooltip();
+                $(delBtnElem).tooltip();
                 itemListElem.appendChild(itemNode);
             }
         }
