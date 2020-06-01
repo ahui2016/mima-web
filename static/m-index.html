@@ -12,10 +12,11 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="/public/jquery-3.5.1.slim.min.js"></script>
+    <script src="/public/jquery-3.5.1.min.js"></script>
     <script src="/public/popper.min.js"></script>
     <script src="/public/bootstrap.min.js"></script>
-  </body>
+  </head>
+  <body>
   <div class="container">
     <nav class="navbar navbar-light bg-light mb-3 mt-1">
         <span class="navbar-brand mb-0 h1">Index</span>
@@ -83,8 +84,34 @@
     </div>
 
     <div class="alert alert-light text-right small">
-        <a href="https://github.com/ahui2016/mima-web">github.com/ahui2016/mima-web</a>
+        <a href="https://github.com/ahui2016/mima-web" class="alert-link">github.com/ahui2016/mima-web</a>
     </div>
+  </div>
+
+    <input type="text" id="textForCopy" hidden>
+
+    <!-- <template id="modal-tmpl"> -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="delete-dialog">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Confirm Deletion</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>Throw it to the recycle bin?</p>
+                  <p>(Title: <span id="title-in-modal"></span>)</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  <button type="button" class="btn btn-primary">Yes</button>
+                </div>
+              </div>
+            </div>
+        </div>
+    <!-- </template> -->
 
     <script>
         $(function () {
@@ -92,6 +119,12 @@
         })
         let itemListElem = document.querySelector('#item-list');
         let itemTmplElem = document.querySelector('#item-tmpl');
+
+        let textForCopy = document.querySelector('#textForCopy');
+        let topContainer = document.querySelector('.container');
+        // let modalTmpl = document.querySelector('#modal-tmpl');
+        let delDialog = document.querySelector('#delete-dialog');
+        let titleInModal = document.querySelector('#title-in-modal');
 
         refillList();
 
@@ -117,15 +150,42 @@ function refillList() {
                 let passCopyBtn = itemNode.querySelector('.PassCopyBtn');
                 let editBtnElem = itemNode.querySelector('.EditButton');
                 let delBtnElem = itemNode.querySelector('.DeleteButton');
-                // let recycleBtnElem = itemNode.querySelector('.RecycleButton');
 
                 if (item.Username) {
                     userCopyBtn.removeAttribute('hidden');
                     $(userCopyBtn).tooltip();
+                    userCopyBtn.addEventListener('click', function() {
+                        textForCopy.removeAttribute('hidden');
+                        textForCopy.value = item.Username;
+                        textForCopy.select();
+                        document.execCommand('copy');
+                        textForCopy.setAttribute('hidden', '');
+                    });
                 }
                 if (item.Password) {
                     passCopyBtn.removeAttribute('hidden');
                     $(passCopyBtn).tooltip();
+                    passCopyBtn.addEventListener('click', function() {
+                        let form = new FormData();
+                        form.append('id', item.ID);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'api/get-password');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
+                        }
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                new Promise(resolve => resolve(textForCopy.removeAttribute('hidden')))
+                                    .then(() => textForCopy.value = this.responseText)
+                                    .then(() => textForCopy.select())
+                                    .then(() => document.execCommand('copy'))
+                                    .then(() => textForCopy.setAttribute('hidden', ''));
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.send(form);
+                    });
                 }
                 titleElem.innerText = item.Title;
                 if (item.Alias) {
@@ -137,12 +197,28 @@ function refillList() {
                 editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
                 $(editBtnElem).tooltip();
                 $(delBtnElem).tooltip();
+
+                delBtnElem.addEventListener('click', function() {
+                    $(delDialog).modal();
+                    titleInModal.innerText = item.Title;
+
+                    let yesBtn = delDialog.querySelector('.btn-primary');
+                    let yesBtnClone = yesBtn.cloneNode(true);
+                    yesBtn.replaceWith(yesBtnClone);
+
+                    yesBtn = delDialog.querySelector('.btn-primary');
+                    yesBtn.addEventListener('click', function() {
+                        console.log(`deleting ${item.ID}`);
+                        $(delDialog).modal('hide');
+                    });
+                });
+
                 itemListElem.appendChild(itemNode);
             }
         }
     }
     xhr.send();
 }
-    </script>
-    </div>
+        </script>
+    </body>
   </html>
