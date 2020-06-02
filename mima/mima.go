@@ -127,6 +127,7 @@ func (m *Mima) Delete() {
 }
 
 func (m *Mima) UnDelete() {
+	m.UpdatedAt = util.TimeNow()
 	m.DeletedAt = ""
 }
 

@@ -44,7 +44,7 @@
 
     <div class="row row-cols-1 row-cols-md-3" id="item-list">
         <template id="item-tmpl">
-            <div class="col mb-4">
+            <div class="col mb-4 item-top-div">
                 <div class="card h-100">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Title</h5>
@@ -141,6 +141,7 @@ function refillList() {
             }
             for (let item of allItems) {
                 let itemNode = itemTmplElem.content.cloneNode(true);
+                let itemTopDiv = itemNode.querySelector('.item-top-div');
                 let titleElem = itemNode.querySelector('.card-title');
                 let aliasElem = itemNode.querySelector('.card-subtitle');
                 let userElem = itemNode.querySelector('.card-text');
@@ -224,8 +225,24 @@ function refillList() {
 
                     yesBtn = delDialog.querySelector('.btn-primary');
                     yesBtn.addEventListener('click', function() {
-                        console.log(`deleting ${item.ID}`);
-                        $(delDialog).modal('hide');
+                        let form = new FormData();
+                        form.append('id', item.ID);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/api/delete');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
+                        }
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                itemTopDiv.setAttribute('hidden', '');
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.addEventListener('loadend', function(){
+                            $(delDialog).modal('hide');
+                        });
+                        xhr.send(form);
                     });
                 });
 

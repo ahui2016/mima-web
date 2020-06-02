@@ -171,6 +171,7 @@ func (db *DB) updateFromFragments(fragFiles []string) error {
 			item.Delete()
 		case mima.UnDelete:
 			item.UnDelete()
+			db.moveToEnd(i)
 		case mima.DeleteForever:
 			db.deleteByIndex(i)
 		}
@@ -457,7 +458,7 @@ func (db *DB) RecycleByID(id string) error {
 }
 
 func (db *DB) RecoverByID(id string) error {
-	_, m, err := db.GetByID(id)
+	i, m, err := db.GetByID(id)
 	if err != nil {
 		return err
 	}
@@ -465,6 +466,7 @@ func (db *DB) RecoverByID(id string) error {
 		return errors.New(id + " not found in recycle bin")
 	}
 	m.UnDelete()
+	db.moveToEnd(i)
 	db.updateHomeCache()
 	db.updateRecycleCache()
 	return db.encryptWriteFragment(m, mima.UnDelete)
