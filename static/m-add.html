@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/bootstrap.min.css">
+
+    <title>Add - mima</title>
+    <script type="text/javascript" src="/public/main.js"></script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="/public/jquery-3.5.1.slim.min.js"></script>
+    <script src="/public/popper.min.js"></script>
+    <script src="/public/bootstrap.min.js"></script>
+  </head>
+  <body>
+  <div class="container" style="width: 480px;">
+    <nav class="navbar navbar-light bg-light mb-3 mt-1">
+        <span class="navbar-brand mb-0 h1">Add a new item</span>
+        <div class="btn-toolbar" role="toolbar" aria-label="nav bar">
+            <div class="btn-group mr-2" role="group">
+                <a type="button" class="btn btn-outline-dark" href="search" data-toggle="tooltip" title="search">
+                    <img src="/public/icons/search.svg" alt="search" style="font-size: 3rem;">
+                </a>
+                <a type="button" class="btn btn-outline-dark" href="index" data-toggle="tooltip" title="All items">
+                    <img src="/public/icons/grid-3x3-gap.svg" alt="all" style="font-size:3rem;">
+                </a>
+                <a type="button" class="btn btn-outline-dark" href="recyclebin" data-toggle="tooltip" title="Recycle Bin">
+                    <img src="/public/icons/trash.svg" alt="Recycle Bin" style="font-size: 3rem;">
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                <a type="button" class="btn btn-outline-dark" href="/logout" data-toggle="tooltip" title="logout">
+                    <img src="/public/icons/power.svg" alt="logout" style="font-size: 3rem;">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
+
+    <div id="okMsg" class="alert alert-primary" role="alert" hidden>
+        OK, <a class="alert-link"></a> is added.
+    </div>
+
+    <form autocomplete="off">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" class="form-control" autofocus required
+                onblur="this.value = this.value.trim()">
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" class="form-control"
+                onblur="this.value = this.value.trim()">
+        </div>
+        <div class="form-group">
+            <label for="password">Password <a href="#" class="badge badge-secondary"
+                onclick="randomPassword(event)">random</a></label>
+            <input type="text" id="password" class="form-control text-monospace"
+                oninput="update_color_password()">
+            <div id="colorPassword" class="text-monospace ml-1 pl-2"></div>
+        </div>
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea type="text" id="notes" class="form-control" rows="4"
+                onblur="this.value = this.value.trim()"></textarea>
+        </div>
+        <input type="submit" disabled hidden>
+        <button type="button" class="btn btn-primary" id="submit">Submit</button>
+    </form>
+
+    <div class="alert alert-light text-right small" style="margin-top: 5rem;">
+        <a href="https://github.com/ahui2016/mima-web" class="alert-link">github.com/ahui2016/mima-web</a>
+    </div>
+  </div>
+
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+    </script>
+    </body>
+  </html>

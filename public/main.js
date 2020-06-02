@@ -1,12 +1,15 @@
-function randomPassword () {
+function randomPassword (event) {
+    event.preventDefault();
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', 'api/random-password');
+    xhr.open('GET', '/api/random-password');
     xhr.onerror = function () {
         window.alert('An error occurred during the transaction');
     }
     xhr.onload = function () {
-        document.querySelector('#password').value = this.responseText;
+        let passElem = document.querySelector('#password');
+        passElem.value = this.responseText;
         update_color_password();
+        passElem.focus();
     }
     xhr.send();
 }

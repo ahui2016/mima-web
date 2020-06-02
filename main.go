@@ -24,6 +24,7 @@ func main() {
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/logout", checkLogin(logoutHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
+	http.HandleFunc("/m/add", checkLogin(mAddPage))
 	http.HandleFunc("/api/add", checkLogin(addHandler))
 	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
 	http.HandleFunc("/edit", checkLogin(editPage))
@@ -129,6 +130,10 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 func addPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["add"])
+}
+
+func mAddPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["m-add"])
 }
 
 func addHandler(w http.ResponseWriter, r *http.Request) {
