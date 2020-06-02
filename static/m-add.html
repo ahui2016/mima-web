@@ -59,24 +59,24 @@
                 onblur="this.value = this.value.trim()">
         </div>
         <div class="form-group">
-            <label for="password">Password <a href="#" class="badge badge-secondary"
-                onclick="randomPassword(event)">random</a></label>
+            <label for="password">Password
+                <a class="badge badge-light" data-toggle="tooltip" data-placement="right"
+                    onclick="randomPassword(event)" title="generate a random password"
+                    href="#"><img src="/public/icons/arrow-repeat.svg" alt="random">
+                </a>
+            </label>
             <input type="text" id="password" class="form-control text-monospace"
                 oninput="update_color_password()">
             <div id="colorPassword" class="text-monospace ml-1 pl-2"></div>
         </div>
         <div class="form-group">
             <label for="notes">Notes</label>
-            <textarea type="text" id="notes" class="form-control" rows="4"
+            <textarea type="text" id="notes" class="form-control" rows="3"
                 onblur="this.value = this.value.trim()"></textarea>
         </div>
         <input type="submit" disabled hidden>
         <button type="button" class="btn btn-primary" id="submit">Submit</button>
     </form>
-
-    <div class="alert alert-light text-right small" style="margin-top: 5rem;">
-        <a href="https://github.com/ahui2016/mima-web" class="alert-link">github.com/ahui2016/mima-web</a>
-    </div>
   </div>
 
     <script>
@@ -84,6 +84,57 @@
             $('[data-toggle="tooltip"]').tooltip()
         })
 
+        let errorElem = document.querySelector('#ErrorMessage');
+        let okElem = document.querySelector('#okMsg');
+        let ok_a_elem = document.querySelector('#okMsg>a');
+        let formElem = document.querySelector('form');
+        let titleElem = document.querySelector('#title');
+        let userElem = document.querySelector('#username');
+        let passElem = document.querySelector('#password');
+        let colorPassElem = document.querySelector('#colorPassword');
+        let notesElem = document.querySelector('#notes');
+        let submitBtn = document.querySelector('#submit');
+
+        function submit(event) {
+            event.preventDefault();
+            let title = titleElem.value.trim();
+            if (title.length == 0) {
+                errorElem.removeAttribute('hidden');
+                errorElem.innerText = 'Error: Title is empty.';
+                titleElem.focus();
+                return
+            }
+            submitBtn.setAttribute('disabled', '');
+
+            let form = new FormData();
+            form.append('title', title);
+            form.append('username', userElem.value);
+            form.append('password', passElem.value);
+            form.append('notes', notesElem.value);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/add');
+            xhr.onerror = function () {
+                window.alert('An error occurred during the transaction');
+            }
+            xhr.onload = function () {
+                if (this.status == 200) {
+                    formElem.setAttribute('hidden', '');
+                    errorElem.setAttribute('hidden', '');
+                    okElem.removeAttribute('hidden');
+                    ok_a_elem.innerText = title;
+                    ok_a_elem.setAttribute('href', `edit?id=${this.responseText}`);
+                } else {
+                    errorElem.removeAttribute('hidden');
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+                }
+            }
+            xhr.addEventListener('loadend', function(){
+                submitBtn.removeAttribute('disabled');
+            });
+            xhr.send(form);
+        }
+        submitBtn.addEventListener('click', submit);
     </script>
     </body>
   </html>
