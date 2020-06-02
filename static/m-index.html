@@ -90,28 +90,26 @@
 
     <input type="text" id="textForCopy" hidden>
 
-    <!-- <template id="modal-tmpl"> -->
-        <div class="modal fade" tabindex="-1" role="dialog" id="delete-dialog">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Confirm Deletion</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <p>Throw it to the recycle bin?</p>
-                  <p>(Title: <span id="title-in-modal"></span>)</p>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                  <button type="button" class="btn btn-primary">Yes</button>
-                </div>
-              </div>
+    <div class="modal" tabindex="-1" role="dialog" id="delete-dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Throw it to the recycle bin?</p>
+                <p>(Title: <span id="title-in-modal"></span>)</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary">Yes</button>
+            </div>
             </div>
         </div>
-    <!-- </template> -->
+    </div>
 
     <script>
         $(function () {
@@ -159,6 +157,15 @@ function refillList() {
                         textForCopy.value = item.Username;
                         textForCopy.select();
                         document.execCommand('copy');
+                        $(userCopyBtn).tooltip('dispose')
+                            .attr('title', 'copied!')
+                            .tooltip()
+                            .tooltip('show');
+                        window.setTimeout(function(){
+                            $(userCopyBtn).tooltip('dispose')
+                                .attr('title', 'copy username')
+                                .tooltip();
+                        }, 2000);
                         textForCopy.setAttribute('hidden', '');
                     });
                 }
@@ -169,7 +176,7 @@ function refillList() {
                         let form = new FormData();
                         form.append('id', item.ID);
                         let xhr = new XMLHttpRequest();
-                        xhr.open('POST', 'api/get-password');
+                        xhr.open('POST', '/api/get-password');
                         xhr.onerror = function () {
                             window.alert('An error occurred during the transaction');
                         }
@@ -179,6 +186,15 @@ function refillList() {
                                     .then(() => textForCopy.value = this.responseText)
                                     .then(() => textForCopy.select())
                                     .then(() => document.execCommand('copy'))
+                                    .then(() => $(passCopyBtn).tooltip('dispose')
+                                        .attr('title', 'copied!')
+                                        .tooltip()
+                                        .tooltip('show'))
+                                    .then(() => window.setTimeout(function(){
+                                        $(passCopyBtn).tooltip('dispose')
+                                            .attr('title', 'copy password')
+                                            .tooltip();
+                                        }, 2000))
                                     .then(() => textForCopy.setAttribute('hidden', ''));
                             } else {
                                 window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
