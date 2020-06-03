@@ -1,5 +1,10 @@
 function randomPassword (event) {
     event.preventDefault();
+    let spinner = document.querySelector('#password-spinner');
+    let self = event.currentTarget;
+    self.setAttribute('hidden', '');
+    spinner.removeAttribute('hidden');
+
     let xhr = new XMLHttpRequest();
     xhr.open('GET', '/api/random-password');
     xhr.onerror = function () {
@@ -11,6 +16,10 @@ function randomPassword (event) {
         update_color_password();
         passElem.focus();
     }
+    xhr.addEventListener('loadend', function(){
+        spinner.setAttribute('hidden', '');
+        self.removeAttribute('hidden');
+    });
     xhr.send();
 }
 

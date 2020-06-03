@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/api/add", checkLogin(addHandler))
 	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
 	http.HandleFunc("/edit", checkLogin(editPage))
+	http.HandleFunc("/m/edit", checkLogin(mEditPage))
 	http.HandleFunc("/api/edit", checkLogin(editHandler))
 	http.HandleFunc("/api/item", checkLogin(getItemHandler))
 	http.HandleFunc("/api/delete-history", checkLogin(deleteHistory))
@@ -156,6 +157,10 @@ func randomPassword(w http.ResponseWriter, r *http.Request) {
 
 func editPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["edit"])
+}
+
+func mEditPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["m-edit"])
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {

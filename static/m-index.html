@@ -40,9 +40,15 @@
         </div>
     </nav>
 
+    <div id="loading-spinner" class="text-center" style="margin-top: 3rem;">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
     <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
 
-    <div class="row row-cols-1 row-cols-md-3" id="item-list">
+    <div class="row row-cols-1 row-cols-md-3" id="item-list" style="margin-top: 3rem;">
         <template id="item-tmpl">
             <div class="col mb-4 item-top-div">
                 <div class="card h-100">
@@ -115,12 +121,14 @@
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
+
+        let loadingElem = document.querySelector('#loading-spinner');
         let itemListElem = document.querySelector('#item-list');
         let itemTmplElem = document.querySelector('#item-tmpl');
 
         let textForCopy = document.querySelector('#textForCopy');
         let topContainer = document.querySelector('.container');
-        // let modalTmpl = document.querySelector('#modal-tmpl');
+
         let delDialog = document.querySelector('#delete-dialog');
         let titleInModal = document.querySelector('#title-in-modal');
 
@@ -215,8 +223,9 @@ function refillList() {
                 $(editBtnElem).tooltip();
                 $(delBtnElem).tooltip();
 
+                $(delDialog).modal({show: false});
                 delBtnElem.addEventListener('click', function() {
-                    $(delDialog).modal();
+                    $(delDialog).modal('show');
                     titleInModal.innerText = item.Title;
 
                     let yesBtn = delDialog.querySelector('.btn-primary');
@@ -250,6 +259,9 @@ function refillList() {
             }
         }
     }
+    xhr.addEventListener('loadend', function(){
+        loadingElem.setAttribute('hidden', '');
+    });
     xhr.send();
 }
         </script>
