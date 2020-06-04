@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/public/bootstrap.min.css">
 
-    <title>All - mima</title>
+    <title>Recycle Bin - mima</title>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -19,17 +19,14 @@
   <body>
   <div class="container">
     <nav class="navbar navbar-light bg-light mb-3 mt-1">
-        <span class="navbar-brand mb-0 h1">All items</span>
+        <span class="navbar-brand mb-0 h1">Recycle Bin</span>
         <div class="btn-toolbar" role="toolbar" aria-label="nav bar">
             <div class="btn-group mr-2" role="group">
                 <a type="button" class="btn btn-outline-dark" href="search" data-toggle="tooltip" title="search">
                     <img src="/public/icons/search.svg" alt="search" style="font-size: 3rem;">
                 </a>
-                <a type="button" class="btn btn-outline-dark" href="add" data-toggle="tooltip" title="add">
-                    <img src="/public/icons/file-earmark-plus.svg" alt="add" style="font-size:3rem;">
-                </a>
-                <a type="button" class="btn btn-outline-dark" href="recyclebin" data-toggle="tooltip" title="Recycle Bin">
-                    <img src="/public/icons/trash.svg" alt="Recycle Bin" style="font-size: 3rem;">
+                <a type="button" class="btn btn-outline-dark" href="index" data-toggle="tooltip" title="All items">
+                    <img src="/public/icons/grid-3x3-gap.svg" alt="all" style="font-size:3rem;">
                 </a>
             </div>
             <div class="btn-group" role="group">
@@ -47,9 +44,9 @@
     </div>
 
     <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
-    <template id="delete-success-alert">
+    <template id="success-alert">
         <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <strong class="deleted-title"></strong> is moved to recycle bin.
+            <strong class="alert-title"></strong> <span class="alert-status"></span>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -66,24 +63,11 @@
                         <p class="card-text"></p>
                         <div class="btn-toolbar mt-auto justify-content-end" role="toolbar">
                             <div class="btn-group mr-2" role="group">
-                                <button type="button" class="btn btn-outline-light UserCopyBtn" data-toggle="tooltip" title="copy username" hidden>
-                                    <svg class="bi bi-person-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                                        <path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                <button type="button" class="btn btn-outline-light RecoverButton" data-toggle="tooltip" title="recover">
+                                    <svg class="bi bi-bootstrap-reboot" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M1.161 8a6.84 6.84 0 1 0 6.842-6.84.58.58 0 0 1 0-1.16 8 8 0 1 1-6.556 3.412l-.663-.577a.58.58 0 0 1 .227-.997l2.52-.69a.58.58 0 0 1 .728.633l-.332 2.592a.58.58 0 0 1-.956.364l-.643-.56A6.812 6.812 0 0 0 1.16 8zm5.48-.079V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324h-1.6zm0 3.75V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352h1.141z"/>
                                     </svg>
                                 </button>
-                                <button type="button" class="btn btn-outline-light PassCopyBtn" data-toggle="tooltip" title="copy password" hidden>
-                                    <svg class="bi bi-lock-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <rect width="11" height="9" x="2.5" y="7" rx="2"/>
-                                        <path fill-rule="evenodd" d="M4.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>
-                                    </svg>
-                                </button>
-                                <a type="button" class="btn btn-outline-light EditButton" data-toggle="tooltip" title="edit">
-                                    <svg class="bi bi-pencil-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                    </svg>
-                                </a>
                                 <button type="button" class="btn btn-outline-light DeleteButton" data-toggle="tooltip" title="delete">
                                     <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
@@ -102,24 +86,43 @@
     </div>
   </div>
 
-    <input type="text" id="textForCopy" hidden>
-
     <div class="modal" tabindex="-1" role="dialog" id="delete-dialog">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirm Deletion</h5>
+                <h5 class="modal-title text-danger">Confirm Deletion</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>Throw it to the recycle bin?</p>
-                <p>(Title: <span id="title-in-modal"></span>)</p>
+                <p>Delete this item? (can not recover)</p>
+                <p>Title: <span class="title-in-modal"></span></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <button type="button" class="btn btn-primary">Yes</button>
+                <button type="button" class="btn btn-danger SubmitButton">Yes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="recover-dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Confirm Recovery</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Recover this item?</p>
+                <p>(Title: <span class="title-in-modal"></span>)</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger SubmitButton">Yes</button>
             </div>
             </div>
         </div>
@@ -131,7 +134,7 @@
         })
 
         let loadingElem = document.querySelector('#loading-spinner');
-        let delSuccessTmpl = document.querySelector('#delete-success-alert');
+        let successTmpl = document.querySelector('#success-alert');
 
         let itemListElem = document.querySelector('#item-list');
         let itemTmplElem = document.querySelector('#item-tmpl');
@@ -140,13 +143,15 @@
         let topContainer = document.querySelector('.container');
 
         let delDialog = document.querySelector('#delete-dialog');
-        let titleInModal = document.querySelector('#title-in-modal');
+        let titleInDeleteModal = delDialog.querySelector('.title-in-modal');
+        let recDialog = document.querySelector('#recover-dialog');
+        let titleInRecoverModal = recDialog.querySelector('.title-in-modal');
 
         refillList();
 
 function refillList() {
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/all-items');
+    xhr.open('GET', '/api/deleted-items');
 
     xhr.onerror = function () {
         window.alert('An error occurred during the transaction');
@@ -161,82 +166,22 @@ function refillList() {
                 let itemNode = itemTmplElem.content.cloneNode(true);
                 let itemTopDiv = itemNode.querySelector('.item-top-div');
                 let titleElem = itemNode.querySelector('.card-title');
-                let aliasElem = itemNode.querySelector('.card-subtitle');
+                let datetimeElem = itemNode.querySelector('.card-subtitle');
                 let userElem = itemNode.querySelector('.card-text');
-                let userCopyBtn = itemNode.querySelector('.UserCopyBtn');
-                let passCopyBtn = itemNode.querySelector('.PassCopyBtn');
-                let editBtnElem = itemNode.querySelector('.EditButton');
-                let delBtnElem = itemNode.querySelector('.DeleteButton');
+                let recoverBtn = itemNode.querySelector('.RecoverButton');
+                let deleteBtn = itemNode.querySelector('.DeleteButton');
 
-                if (item.Username) {
-                    userCopyBtn.removeAttribute('hidden');
-                    $(userCopyBtn).tooltip();
-                    userCopyBtn.addEventListener('click', function() {
-                        textForCopy.removeAttribute('hidden');
-                        textForCopy.value = item.Username;
-                        textForCopy.select();
-                        document.execCommand('copy');
-                        $(userCopyBtn).tooltip('dispose')
-                            .attr('title', 'copied!')
-                            .tooltip()
-                            .tooltip('show');
-                        window.setTimeout(function(){
-                            $(userCopyBtn).tooltip('dispose')
-                                .attr('title', 'copy username')
-                                .tooltip();
-                        }, 2000);
-                        textForCopy.setAttribute('hidden', '');
-                    });
-                }
-                if (item.Password) {
-                    passCopyBtn.removeAttribute('hidden');
-                    $(passCopyBtn).tooltip();
-                    passCopyBtn.addEventListener('click', function() {
-                        let form = new FormData();
-                        form.append('id', item.ID);
-                        let xhr = new XMLHttpRequest();
-                        xhr.open('POST', '/api/get-password');
-                        xhr.onerror = function () {
-                            window.alert('An error occurred during the transaction');
-                        }
-                        xhr.onload = function () {
-                            if (this.status == 200) {
-                                new Promise(resolve => resolve(textForCopy.removeAttribute('hidden')))
-                                    .then(() => textForCopy.value = this.responseText)
-                                    .then(() => textForCopy.select())
-                                    .then(() => document.execCommand('copy'))
-                                    .then(() => $(passCopyBtn).tooltip('dispose')
-                                        .attr('title', 'copied!')
-                                        .tooltip()
-                                        .tooltip('show'))
-                                    .then(() => window.setTimeout(function(){
-                                        $(passCopyBtn).tooltip('dispose')
-                                            .attr('title', 'copy password')
-                                            .tooltip();
-                                        }, 2000))
-                                    .then(() => textForCopy.setAttribute('hidden', ''));
-                            } else {
-                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
-                            }
-                        }
-                        xhr.send(form);
-                    });
-                }
                 titleElem.innerText = item.Title;
-                if (item.Alias) {
-                    aliasElem.innerText = `[${item.Alias}]`;
-                }
                 if (item.Username) {
                     userElem.innerText = item.Username;
                 }
-                editBtnElem.setAttribute('href', `edit?id=${item.ID}`);
-                $(editBtnElem).tooltip();
-                $(delBtnElem).tooltip();
+                $(recoverBtn).tooltip();
+                $(deleteBtn).tooltip();
 
                 $(delDialog).modal({show: false});
-                delBtnElem.addEventListener('click', function() {
+                deleteBtn.addEventListener('click', function() {
                     $(delDialog).modal('show');
-                    titleInModal.innerText = item.Title;
+                    titleInDeleteModal.innerText = item.Title;
 
                     let yesBtn = delDialog.querySelector('.btn-primary');
                     let yesBtnClone = yesBtn.cloneNode(true);
@@ -249,16 +194,18 @@ function refillList() {
                         let form = new FormData();
                         form.append('id', item.ID);
                         let xhr = new XMLHttpRequest();
-                        xhr.open('POST', '/api/delete');
+                        xhr.open('POST', '/api/delete-forever');
                         xhr.onerror = function () {
                             window.alert('An error occurred during the transaction');
                         }
                         xhr.onload = function () {
                             if (this.status == 200) {
-                                let alert = delSuccessTmpl.content.cloneNode(true);
-                                let deletedTitle = alert.querySelector('.deleted-title');
+                                let alert = successTmpl.content.cloneNode(true);
+                                let alertTitle = alert.querySelector('.alert-title');
+                                let alertStatus = alert.querySelector('.alert-status');
                                 deletedTitle.innerText = item.Title;
-                                topContainer.insertBefore(alert, delSuccessTmpl);
+                                alertStatus.innerText = 'is deleted permanently.'
+                                topContainer.insertBefore(alert, successTmpl);
                                 itemTopDiv.setAttribute('hidden', '');
                             } else {
                                 window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
@@ -267,6 +214,47 @@ function refillList() {
                         xhr.addEventListener('loadend', function(){
                             yesBtn.removeAttribute('disabled');
                             $(delDialog).modal('hide');
+                        });
+                        xhr.send(form);
+                    });
+                });
+
+                $(recDialog).modal({show: false});
+                recoverBtn.addEventListener('click', function() {
+                    $(recDialog).modal('show');
+                    titleInDeleteModal.innerText = item.Title;
+
+                    let yesBtn = recDialog.querySelector('.btn-primary');
+                    let yesBtnClone = yesBtn.cloneNode(true);
+                    yesBtn.replaceWith(yesBtnClone);
+
+                    yesBtn = recDialog.querySelector('.btn-primary');
+                    yesBtn.addEventListener('click', function() {
+                        yesBtn.setAttribute('disabled', '');
+
+                        let form = new FormData();
+                        form.append('id', item.ID);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/api/recover');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
+                        }
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                let alert = successTmpl.content.cloneNode(true);
+                                let alertTitle = alert.querySelector('.alert-title');
+                                let alertStatus = alert.querySelector('.alert-status');
+                                deletedTitle.innerText = item.Title;
+                                alertStatus.innerText = 'is successfully recovered.'
+                                topContainer.insertBefore(alert, successTmpl);
+                                itemTopDiv.setAttribute('hidden', '');
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.addEventListener('loadend', function(){
+                            yesBtn.removeAttribute('disabled');
+                            $(recDialog).modal('hide');
                         });
                         xhr.send(form);
                     });

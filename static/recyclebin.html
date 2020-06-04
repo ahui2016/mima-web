@@ -28,7 +28,6 @@
                         <a class="EditButton">edit</a>
                     </span>
                     <br>
-                    <span class="Alias"></span>
                     <span class="Username"></span>
                 </div>
             </li>
@@ -64,7 +63,6 @@
                     let confirmRecover = itemDiv.querySelector('.ConfirmRecover');
                     let delBtnElem = itemDiv.querySelector('.DeleteButton');
                     let confirmDelete = itemDiv.querySelector('.ConfirmDelete');
-                    let aliasElem = itemDiv.querySelector('.Alias');
                     let userElem = itemDiv.querySelector('.Username');
                     let titleButtons = itemDiv.querySelector('.TitleButtons');
                     let recoverOK = itemDiv.querySelector('.RecoverOK');
@@ -127,9 +125,6 @@
                         });
                         xhr.send(form);
                     });
-                    if (item.Alias) {
-                        aliasElem.innerText = `[${item.Alias}]`;
-                    }
                     if (item.Username) {
                         userElem.innerText = item.Username;
                     }
