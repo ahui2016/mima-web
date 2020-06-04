@@ -44,14 +44,6 @@
     </div>
 
     <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
-    <template id="success-alert">
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <strong class="alert-title"></strong> <span class="alert-status"></span>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </template>
 
     <div class="row row-cols-1 row-cols-md-3" id="item-list" style="margin-top: 3rem;">
         <template id="item-tmpl">
@@ -76,6 +68,17 @@
                             </div>
                         </div>
                       </div>
+                </div>
+              </div>
+        </template>
+        <template id="item-info-tmpl">
+            <div class="col mb-4 item-top-div">
+                <div class="card bg-light h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted"></h6>
+                        <p class="card-text"></p>
+                    </div>
                 </div>
               </div>
         </template>
@@ -111,7 +114,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-danger">Confirm Recovery</h5>
+                <h5 class="modal-title">Confirm Recovery</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -122,7 +125,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <button type="button" class="btn btn-danger SubmitButton">Yes</button>
+                <button type="button" class="btn btn-primary SubmitButton">Yes</button>
             </div>
             </div>
         </div>
@@ -132,12 +135,11 @@
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
-
         let loadingElem = document.querySelector('#loading-spinner');
-        let successTmpl = document.querySelector('#success-alert');
 
         let itemListElem = document.querySelector('#item-list');
         let itemTmplElem = document.querySelector('#item-tmpl');
+        let itemInfoTmpl = document.querySelector('#item-info-tmpl');
 
         let textForCopy = document.querySelector('#textForCopy');
         let topContainer = document.querySelector('.container');
@@ -171,7 +173,11 @@ function refillList() {
                 let recoverBtn = itemNode.querySelector('.RecoverButton');
                 let deleteBtn = itemNode.querySelector('.DeleteButton');
 
+                let itemID = `mima-${item.ID}`;
+                itemTopDiv.setAttribute('id', itemID);
+
                 titleElem.innerText = item.Title;
+                datetimeElem.innerText = `deleted at: ${item.DeletedAt}`;
                 if (item.Username) {
                     userElem.innerText = item.Username;
                 }
@@ -183,11 +189,11 @@ function refillList() {
                     $(delDialog).modal('show');
                     titleInDeleteModal.innerText = item.Title;
 
-                    let yesBtn = delDialog.querySelector('.btn-primary');
+                    let yesBtn = delDialog.querySelector('.SubmitButton');
                     let yesBtnClone = yesBtn.cloneNode(true);
                     yesBtn.replaceWith(yesBtnClone);
 
-                    yesBtn = delDialog.querySelector('.btn-primary');
+                    yesBtn = delDialog.querySelector('.SubmitButton');
                     yesBtn.addEventListener('click', function() {
                         yesBtn.setAttribute('disabled', '');
 
@@ -200,12 +206,11 @@ function refillList() {
                         }
                         xhr.onload = function () {
                             if (this.status == 200) {
-                                let alert = successTmpl.content.cloneNode(true);
-                                let alertTitle = alert.querySelector('.alert-title');
-                                let alertStatus = alert.querySelector('.alert-status');
-                                deletedTitle.innerText = item.Title;
-                                alertStatus.innerText = 'is deleted permanently.'
-                                topContainer.insertBefore(alert, successTmpl);
+                                let info = itemInfoTmpl.content.cloneNode(true);
+                                info.querySelector('.card-title').innerText = item.Title;
+                                info.querySelector('.card-text').innerText  = 'DELETED';
+                                let thisElem = document.querySelector(`#${itemID}`);
+                                itemListElem.replaceChild(info, thisElem);
                                 itemTopDiv.setAttribute('hidden', '');
                             } else {
                                 window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
@@ -222,13 +227,13 @@ function refillList() {
                 $(recDialog).modal({show: false});
                 recoverBtn.addEventListener('click', function() {
                     $(recDialog).modal('show');
-                    titleInDeleteModal.innerText = item.Title;
+                    titleInRecoverModal.innerText = item.Title;
 
-                    let yesBtn = recDialog.querySelector('.btn-primary');
+                    let yesBtn = recDialog.querySelector('.SubmitButton');
                     let yesBtnClone = yesBtn.cloneNode(true);
                     yesBtn.replaceWith(yesBtnClone);
 
-                    yesBtn = recDialog.querySelector('.btn-primary');
+                    yesBtn = recDialog.querySelector('.SubmitButton');
                     yesBtn.addEventListener('click', function() {
                         yesBtn.setAttribute('disabled', '');
 
@@ -241,12 +246,11 @@ function refillList() {
                         }
                         xhr.onload = function () {
                             if (this.status == 200) {
-                                let alert = successTmpl.content.cloneNode(true);
-                                let alertTitle = alert.querySelector('.alert-title');
-                                let alertStatus = alert.querySelector('.alert-status');
-                                deletedTitle.innerText = item.Title;
-                                alertStatus.innerText = 'is successfully recovered.'
-                                topContainer.insertBefore(alert, successTmpl);
+                                let info = itemInfoTmpl.content.cloneNode(true);
+                                info.querySelector('.card-title').innerText = item.Title;
+                                info.querySelector('.card-text').innerText  = 'RECOVERED';
+                                let thisElem = document.querySelector(`#${itemID}`);
+                                itemListElem.replaceChild(info, thisElem);
                                 itemTopDiv.setAttribute('hidden', '');
                             } else {
                                 window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);

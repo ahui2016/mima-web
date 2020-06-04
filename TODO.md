@@ -6,7 +6,7 @@
 
 
 
-## show error message inside modal
+## success message replace the card
 
 
 

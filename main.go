@@ -34,6 +34,7 @@ func main() {
 	http.HandleFunc("/api/delete-history", checkLogin(deleteHistory))
 	http.HandleFunc("/api/delete", checkLogin(deleteHandler))
 	http.HandleFunc("/recyclebin", checkLogin(recyclePage))
+	http.HandleFunc("/m/recyclebin", checkLogin(mRecyclePage))
 	http.HandleFunc("/api/deleted-items", checkLogin(getDeletedHandler))
 	http.HandleFunc("/api/recover", checkLogin(recoverHandler))
 	http.HandleFunc("/api/delete-forever", checkLogin(deleteForever))
@@ -71,6 +72,10 @@ func mIndexPage(w http.ResponseWriter, r *http.Request) {
 
 func recyclePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["recyclebin"])
+}
+
+func mRecyclePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["m-recyclebin"])
 }
 
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
