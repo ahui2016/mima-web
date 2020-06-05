@@ -17,10 +17,12 @@ func main() {
 	http.Handle("/public/", http.StripPrefix("/public/", fs))
 
 	http.HandleFunc("/", homePage)
+	http.HandleFunc("/favicon.ico", faviconHandler)
 	http.HandleFunc("/index", checkLogin(indexPage))
 	http.HandleFunc("/m/index", checkLogin(mIndexPage))
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
+	http.HandleFunc("/m/login", mLoginPage)
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/logout", checkLogin(logoutHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
@@ -45,7 +47,7 @@ func main() {
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
 
-	addr := "127.0.0.1:8080"
+	addr := "127.0.0.1:8081"
 	fmt.Println(addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
@@ -60,6 +62,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.NotFound(w, r)
 	}
+}
+
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "public/favicon.ico")
 }
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +102,10 @@ func getDeletedHandler(w http.ResponseWriter, r *http.Request) {
 
 func loginPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["login"])
+}
+
+func mLoginPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["m-login"])
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
