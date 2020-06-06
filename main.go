@@ -45,6 +45,7 @@ func main() {
 	http.HandleFunc("/api/search", checkLogin(searchHandler))
 	http.HandleFunc("/api/get-password", checkLogin(getPassword))
 	http.HandleFunc("/download", checkLogin(downloadPage))
+	http.HandleFunc("/m/download", checkLogin(downloadPage))
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
 
