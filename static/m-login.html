@@ -30,18 +30,20 @@
         </svg>
     </div>
 
-    <div class="text-center">
-        <p>Protects your passwords in your own server.</p>
+    <div class="text-center" style="margin-bottom: 3rem;" >
+        <p>Protects your passwords in your own server</p>
         <p>保护你的私人密码 在你的私人服务器里</p>
     </div>
 
     <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
 
     <div id="okMsg" class="alert alert-primary" role="alert" hidden>
-        OK, <a class="alert-link"></a> is added.
+        OK, go to <a class="alert-link" href="/m/search">home</a> page
+        or
+        <a class="alert-link" href="#" onclick="window.location.reload()">reload</a> current page.
     </div>
-
-    <form style="margin-top: 3rem;" autocomplete="off">
+ 
+    <form autocomplete="off">
         <div class="input-group">
             <label for="password" hidden>Password</label>
             <input type="password" id="password" class="form-control text-center"
@@ -54,6 +56,57 @@
 </div>
 
     <script>
+    let pwElem = document.querySelector('#password');
+    let submitBtn = document.querySelector('#submit');
+    let messageElem = document.querySelector('#ErrorMessage');
+    let formElem = document.querySelector('form');
+    let okElem = document.querySelector('#okMsg');
+
+    function hideFormMessage() {
+        formElem.setAttribute('hidden', '');
+        messageElem.setAttribute('hidden', '');
+    }
+    function submit(event) {
+        event.preventDefault();
+        submitBtn.setAttribute('disabled', '');
+        pwElem.setAttribute('disabled', '');
+
+        let form = new FormData();
+        form.append('password', pwElem.value);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('post', '/api/login');
+
+        xhr.onerror = function () {
+            messageElem.removeAttribute('hidden');
+            messageElem.innerText = 'An error occurred during the transaction';
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                okElem.removeAttribute('hidden');
+                hideFormMessage();
+            }
+            else if (this.status == 403) {
+                messageElem.removeAttribute('hidden');
+                messageElem.innerText = 'No more try. Input wrong password too many times.';
+                hideFormMessage();
+            }
+            else {
+                messageElem.removeAttribute('hidden');
+                messageElem.innerText = `Error: ${this.status} ${this.statusText} ${this.response}`;
+            }
+        }
+        xhr.addEventListener('loadend', function(){
+            submitBtn.removeAttribute('disabled');
+            pwElem.removeAttribute('disabled');
+            pwElem.focus();
+        });
+
+        xhr.send(form);
+    }
+    // submitBtn.addEventListener('click', submit);
+    formElem.addEventListener('submit', submit);
+    // pwElem.focus();
 
     </script>
     </body>
