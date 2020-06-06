@@ -41,6 +41,7 @@ func main() {
 	http.HandleFunc("/api/recover", checkLogin(recoverHandler))
 	http.HandleFunc("/api/delete-forever", checkLogin(deleteForever))
 	http.HandleFunc("/search", checkLogin(searchPage))
+	http.HandleFunc("/m/search", checkLogin(mSearchPage))
 	http.HandleFunc("/api/search", checkLogin(searchHandler))
 	http.HandleFunc("/api/get-password", checkLogin(getPassword))
 	http.HandleFunc("/download", checkLogin(downloadPage))
@@ -224,6 +225,10 @@ func deleteForever(w http.ResponseWriter, r *http.Request) {
 
 func searchPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["search"])
+}
+
+func mSearchPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, htmlFiles["m-search"])
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {

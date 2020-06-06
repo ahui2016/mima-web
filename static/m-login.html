@@ -100,7 +100,7 @@
         xhr.addEventListener('loadend', function(){
             submitBtn.removeAttribute('disabled');
             pwElem.removeAttribute('disabled');
-            pwElem.focus();
+            pwElem.select();
         });
 
         xhr.send(form);
