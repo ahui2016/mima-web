@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/bootstrap.min.css">
+
+    <title>Logged in - mima</title>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="/public/jquery-3.5.1.slim.min.js"></script>
+    <script src="/public/popper.min.js"></script>
+    <script src="/public/bootstrap.min.js"></script>
+  </head>
+<body style="background-color: white;">
+    <div class="container" style="width: 400px; margin-top: 30px;">
+
+        <h1 class="text-center my-3">
+            mima-web
+        </h1>
+
+        <div class="text-center my-3" style="color: darkslategrey;">
+            <svg class="bi bi-shield-lock-fill" width="10em" height="10em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.187 1.025C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815zm3.328 6.884a1.5 1.5 0 1 0-1.06-.011.5.5 0 0 0-.044.136l-.333 2a.5.5 0 0 0 .493.582h.835a.5.5 0 0 0 .493-.585l-.347-2a.5.5 0 0 0-.037-.122z"/>
+            </svg>
+        </div>
+
+        <div id="okMsg" class="alert alert-primary" style="margin-top: 3rem;" role="alert">
+            You've logged in.
+            <a class="alert-link" href="#" onclick="window.history.back()">go back</a>
+            to previous page. or <a href="/logout" class="alert-link">logout</a>.
+        </div>
+    </div>
+</body>
+</html>

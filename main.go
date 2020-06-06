@@ -22,7 +22,7 @@ func main() {
 	http.HandleFunc("/m/index", checkLogin(mIndexPage))
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
-	http.HandleFunc("/m/login", mLoginPage)
+	http.HandleFunc("/m/login", noMore(mLoginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/logout", checkLogin(logoutHandler))
 	http.HandleFunc("/add", checkLogin(addPage))

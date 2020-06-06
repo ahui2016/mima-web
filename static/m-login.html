@@ -83,6 +83,7 @@
         }
         xhr.onload = function () {
             if (this.status == 200) {
+                document.querySelector('body').setAttribute('style', 'background-color: white');
                 okElem.removeAttribute('hidden');
                 hideFormMessage();
             }
