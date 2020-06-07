@@ -10,9 +10,10 @@
 
 ## 2020-06-07 重要更新
 
-前端界面使用 Bootstrap 重写，现已支持手机适配，也好看了很多。
+前端界面使用 Bootstrap 重写，好看了很多。
 
-- 旧版 demo http
+- 旧版 demo <http://demo.ai42.xyz> (密码：abc)
+- 新版 demo <http://demo.ai42.xyz/m> (密码：abc)
 
 ## Install
 
@@ -90,7 +91,7 @@ v2ex.com 的用户名到剪贴板，执行 `mypass -p v2` 就能复制密码到�
 
 ### 新版 demo
 
-<http://demo.ai42.xyz> (密码：abc) (页面未做移动端适配)
+<http://demo.ai42.xyz/m> (密码：abc) (已适配移动端)
 
 ## Requirement
 
