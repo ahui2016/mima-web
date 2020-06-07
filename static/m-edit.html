@@ -216,10 +216,6 @@
             xhr.send(form);
         }
 
-        function simpleDatetime(aDate) {
-            return aDate.toString().split(' ').slice(1, 5).join(' ')
-        }
-
         function fillHistory(mima) {
             if (mima.History == null || mima.History.length == 0) {
                 return

@@ -36,6 +36,10 @@ function update_color_password () {
     document.querySelector('#colorPassword').innerHTML = pwd_html;
 }
 
+function simpleDatetime(aDate) {
+    return aDate.toString().split(' ').slice(1, 5).join(' ')
+}
+
 function simpleDate(timestamp) {
     const date = new Date(timestamp);
     let year = '' + date.getFullYear(),

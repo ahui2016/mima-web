@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/public/bootstrap.min.css">
 
     <title>Recycle Bin - mima</title>
+    <script type="text/javascript" src="/public/main.js"></script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -177,7 +178,8 @@ function refillList() {
                 itemTopDiv.setAttribute('id', itemID);
 
                 titleElem.innerText = item.Title;
-                datetimeElem.innerText = `deleted at: ${item.DeletedAt}`;
+                let dt = new Date(item.DeletedAt);
+                datetimeElem.innerText = `deleted at: ${simpleDatetime(dt)}`;
                 if (item.Username) {
                     userElem.innerText = item.Username;
                 }
