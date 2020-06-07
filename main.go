@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/m/login", noMore(mLoginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/logout", checkLogin(logoutHandler))
+	http.HandleFunc("/m/logout", checkLogin(logoutHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
 	http.HandleFunc("/m/add", checkLogin(mAddPage))
 	http.HandleFunc("/api/add", checkLogin(addHandler))
