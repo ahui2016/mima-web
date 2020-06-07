@@ -8,6 +8,12 @@
 
 自己架设密码管理软件的好处是，拥有数据的绝对控制权。
 
+## 2020-06-07 重要更新
+
+前端界面使用 Bootstrap 重写，现已支持手机适配，也好看了很多。
+
+- 旧版 demo http
+
 ## Install
 
 1. `git clone https://github.com/ahui2016/mima-web.git`
@@ -79,6 +85,10 @@ v2ex.com 的用户名到剪贴板，执行 `mypass -p v2` 就能复制密码到�
 因此，可以尽管放心修改，绝对不用担心覆盖旧信息。
 
 ## Demo
+
+<http://demo.ai42.xyz> (密码：abc) (页面未做移动端适配)
+
+### 新版 demo
 
 <http://demo.ai42.xyz> (密码：abc) (页面未做移动端适配)
 

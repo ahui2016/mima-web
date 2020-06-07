@@ -62,6 +62,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	case "/home":
 		// fmt.Fprint(w, htmlFiles["search"])
 		http.Redirect(w, r, "/search", 302)
+	case "/m":
+		fallthrough
+	case "/m/home":
+		http.Redirect(w, r, "/m/search", 302)
 	default:
 		http.NotFound(w, r)
 	}
@@ -142,7 +146,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	db.Reset()
+	// db.Reset()
 	sessionManager.DeleteSID(w, r)
 	fmt.Fprint(w, "Logged out.")
 }
