@@ -50,7 +50,7 @@ func main() {
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
 
-	addr := "127.0.0.1:8081"
+	addr := "127.0.0.1:8080"
 	fmt.Println(addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
@@ -146,7 +146,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	// db.Reset()
+	db.Reset()
 	sessionManager.DeleteSID(w, r)
 	fmt.Fprint(w, "Logged out.")
 }
