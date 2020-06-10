@@ -1,78 +1,168 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/bootstrap.min.css">
+
     <title>Edit - mima</title>
-    <link rel="stylesheet" href="public/style.css">
-    <script type="text/javascript" src="public/main.js"></script>
-</head>
-<body>
-    <p><a href="home">home</a></p>
+    <script type="text/javascript" src="/public/main.js"></script>
 
-    <h2>Edit - mima</h2>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="/public/jquery-3.5.1.slim.min.js"></script>
+    <script src="/public/popper.min.js"></script>
+    <script src="/public/bootstrap.min.js"></script>
+  </head>
+  <body>
+  <div class="container" style="width: 480px;">
+    <nav class="navbar navbar-light bg-light mb-3 mt-1">
+        <span class="navbar-brand mb-0 h1">Edit</span>
+        <div class="btn-toolbar" role="toolbar" aria-label="nav bar">
+            <div class="btn-group mr-2" role="group">
+                <a role="button" class="btn btn-outline-dark" href="search" data-toggle="tooltip" title="search">
+                    <img src="/public/icons/search.svg" alt="search" style="font-size: 3rem;">
+                </a>
+                <a role="button" class="btn btn-outline-dark" href="index" data-toggle="tooltip" title="All items">
+                    <img src="/public/icons/grid-3x3-gap.svg" alt="all" style="font-size:3rem;">
+                </a>
+                <a role="button" class="btn btn-outline-dark" href="recyclebin" data-toggle="tooltip" title="Recycle Bin">
+                    <img src="/public/icons/trash.svg" alt="Recycle Bin" style="font-size: 3rem;">
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                <a role="button" class="btn btn-outline-dark" href="logout" data-toggle="tooltip" title="logout">
+                    <img src="/public/icons/power.svg" alt="logout" style="font-size: 3rem;">
+                </a>
+            </div>
+        </div>
+    </nav>
 
-    <p id="ErrorMessage"></p>
+    <div id="ErrorMessage" class="alert alert-danger" role="alert" hidden></div>
 
-    <p id="ok" hidden>Edit OK.</p>
-
-    <p class="LoadingMessage">Loading...</p>
-
-    <form id="EditForm" autocomplete="off" hidden>
-        <label>Title:
-            <input type="text" id="title" class="TextField" autofocus required
-                onblur="this.value = this.value.trim()">
-        </label>
-        <label>Alias:
-            <input type="text" id="alias" class="TextField"
-                onblur="this.value = this.value.trim()">
-        </label>
-        <label>Username:
-            <input type="text" id="username" class="TextField"
-                onblur="this.value = this.value.trim()">
-        </label>
-        <label>Password:
-            <span class="InlineButton" onclick="randomPassword()">random</span>
-            <input type="text" id="password" class="TextField"
-                oninput="update_color_password()">
-            <div id="colorPassword"></div>
-        </label>
-        <label>Notes:
-            <textarea id="notes" class="TextField"
-                onblur="this.value = this.value.trim()"></textarea>
-        </label>
-        <p><input type="submit" disabled hidden></p>
-        <p><button id="submit">Submit</button></p>
-    </form>
-
-    <div id="history" hidden>
-        <p>History</p>
-        <hr>
-        <ul id="item-list">
-            <template id="item-tmpl">
-                <li>
-                    <div>
-                        <strong class="Title"></strong>
-                        <span class="DeleteButton InlineButton">delete</span>
-                        <span class="DelForeverButton RedButton" hidden>delete forever</span>
-                        <br>
-                        <span class="DateTime"></span>
-                        <br>
-                        <span class="Username"></span>
-                        <span class="Password"></span>
-                        <span class="Notes"></span>
-                    </div>
-                </li>
-            </template>
-        </ul>
+    <div id="okMsg" class="alert alert-primary" role="alert" hidden>
+        Edit OK.
     </div>
 
+    <div id="loading-spinner" class="text-center" style="margin-top: 3rem;">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <form style="margin-top: 3rem;" autocomplete="off" hidden>
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" class="form-control" autofocus required
+                onblur="this.value = this.value.trim()">
+        </div>
+        <div class="form-group">
+            <label for="alias">Alias</label>
+            <input type="text" id="alias" class="form-control"
+                onblur="this.value = this.value.trim()">
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" class="form-control"
+                onblur="this.value = this.value.trim()">
+        </div>
+        <div class="form-group">
+            <label for="password">Password
+                <div role="status" aria-hidden="true" hidden id="password-spinner"
+                    class="spinner-border spinner-border-sm text-secondary ml-1">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <a class="badge badge-light" data-toggle="tooltip" data-placement="right"
+                    onclick="randomPassword(event)" title="generate a random password"
+                    href="#"><img src="/public/icons/arrow-repeat.svg" alt="random">
+                </a>
+            </label>
+            <input type="text" id="password" class="form-control text-monospace"
+                oninput="update_color_password()">
+            <div id="colorPassword" class="text-monospace ml-1 pl-2"></div>
+        </div>
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea type="text" id="notes" class="form-control" rows="3"
+                onblur="this.value = this.value.trim()"></textarea>
+        </div>
+        <input type="submit" disabled hidden>
+        <div class="text-right">
+            <button type="button" class="btn btn-primary mt-3" id="submit">Submit</button>
+        </div>
+    </form>
+
+    <div id="history" style="margin-top: 3rem; margin-bottom: 5rem;" hidden>
+        <p>History</p>
+        <hr>
+        <div class="accordion" id="item-list">
+            <template id="item-tmpl">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                                aria-expanded="true">
+                            </button>
+                        </h2>
+                    </div>
+                    <div class="collapse" data-parent="#item-list">
+                        <div class="card-body">
+                            <p class="text-right">
+                                <button type="button" class="btn btn-outline-light DeleteButton" data-toggle="tooltip" title="delete">
+                                    <img src="/public/icons/trash-fill.svg" alt="delete">
+                                </button>
+                            </p>
+                            <table class="table">
+                                <tbody>
+                                    <tr> <td>Title</th>    <td class="h-title"></td> </tr>
+                                    <tr> <td>Username</th> <td class="h-user"></td>  </tr>
+                                    <tr> <td>Password</th> <td class="h-pass"></td>  </tr>
+                                    <tr> <td>Notes</th>    <td class="h-notes"></td> </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="delete-dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Delete this history item? (can not recover)</p>
+                <p>item: <span id="datetime-in-modal"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger SubmitButton">Yes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
     <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
         let errorElem = document.querySelector('#ErrorMessage');
-        let okElem = document.querySelector('#ok');
-        let ok_a_elem = document.querySelector('#ok>a');
-        let loadingElem = document.querySelector('.LoadingMessage');
-        let formElem = document.querySelector('#EditForm');
-        let submitBtn = document.querySelector('#submit');
+        let okElem = document.querySelector('#okMsg');
+        let ok_a_elem = document.querySelector('#okMsg>a');
+        let loadingElem = document.querySelector('#loading-spinner');
+        let formElem = document.querySelector('form');
         let historyElem = document.querySelector('#history');
         let itemListElem = document.querySelector('#item-list');
         let itemTmplElem = document.querySelector('#item-tmpl');
@@ -83,14 +173,11 @@
         let passElem = document.querySelector('#password');
         let colorPassElem = document.querySelector('#colorPassword');
         let notesElem = document.querySelector('#notes');
+        let submitBtn = document.querySelector('#submit');
 
-        // set length
-        const textFieldWidth = 300;
-        let textFields = document.querySelectorAll('.TextField');
-        textFields.forEach(e => e.style.width = textFieldWidth + 'px');
-        submitBtn.style.marginLeft = textFieldWidth - submitBtn.offsetWidth + 'px';
+        let delDialog = document.querySelector('#delete-dialog');
+        let datetimeInModal = document.querySelector('#datetime-in-modal');
 
-        // set data
         let loc = new URL(document.location);
         let id = loc.searchParams.get('id');
         setData();
@@ -100,15 +187,15 @@
             form.append('id', id);
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', 'api/item');
+            xhr.open('POST', '/api/item');
 
             xhr.onerror = function () {
                 window.alert('An error occurred during the transaction');
             }
             xhr.onload = function () {
                 if (this.status == 200) {
+                    errorElem.setAttribute('hidden', '');
                     formElem.removeAttribute('hidden');
-                    loadingElem.setAttribute('hidden', '');
 
                     let mima = JSON.parse(this.responseText);
                     titleElem.value = mima.Title;
@@ -119,9 +206,13 @@
                     update_color_password();
                     fillHistory(mima);
                 } else {
+                    errorElem.removeAttribute('hidden');
                     errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
                 }
             }
+            xhr.addEventListener('loadend', function(){
+                loadingElem.setAttribute('hidden', '');
+            });
             xhr.send(form);
         }
 
@@ -130,59 +221,69 @@
                 return
             }
             historyElem.removeAttribute('hidden');
+            let n = 0;
             for (let h_item of mima.History) {
                 let itemNode = itemTmplElem.content.cloneNode(true);
-                let liElem = itemNode.querySelector('li');
-                let itemDiv = itemNode.querySelector('div');
-                let titleElem = itemDiv.querySelector('.Title');
-                let delBtnElem = itemDiv.querySelector('.DeleteButton');
-                let delForeverBtnElem = itemDiv.querySelector('.DelForeverButton');
-                let datetimeElem = itemDiv.querySelector('.DateTime');
-                let userElem = itemDiv.querySelector('.Username');
-                let passwordElem = itemDiv.querySelector('.Password');
-                let notesElem = itemDiv.querySelector('.Notes');
+                let cardElem = itemNode.querySelector('.card');
 
-                titleElem.innerText = h_item.Title;
-                let datetime = new Date(h_item.DateTime);
-                datetimeElem.innerText = `DateTime: ${datetime}`;
-                if (h_item.Username) {
-                    userElem.innerText = `Username: ${h_item.Username}`;
-                }
-                if (h_item.Password) {
-                    passwordElem.innerText = `Password: ${h_item.Password}`;
-                }
-                if (h_item.Notes) {
-                    notesElem.innerText = `Notes: ${h_item.Notes}`;
-                }
+                n++;
+                let cardHeader = cardElem.querySelector('.card-header');
+                cardHeader.setAttribute('id', `item-${n}`);
+                let headerBtn = cardElem.querySelector('.btn');
+                headerBtn.setAttribute('data-target', `#collapse-${n}`);
+                headerBtn.setAttribute('aria-controls', `collapse-${n}`);
+                let dt = new Date(h_item.DateTime);
+                headerBtn.innerText = simpleDatetime(dt);
 
-                delBtnElem.addEventListener('click', function() {
-                    delBtnElem.setAttribute('hidden', '');
-                    delForeverBtnElem.removeAttribute('hidden');
-                });
-                delForeverBtnElem.addEventListener('click', function() {
-                    delForeverBtnElem.setAttribute('hidden', '');
+                let collapse = cardElem.querySelector('.collapse');
+                collapse.setAttribute('id', `collapse-${n}`);
+                collapse.setAttribute('aria-labelledby', `item-${n}`);
+                let cardBody = cardElem.querySelector('.card-body');
+                let delButton = cardBody.querySelector('.DeleteButton');
+                $(delButton).tooltip();
 
-                    let form = new FormData();
-                    form.append('id', id);
-                    form.append('datetime', h_item.DateTime);
+                let h_title = cardBody.querySelector('.h-title');
+                let h_user = cardBody.querySelector('.h-user');
+                let h_pass = cardBody.querySelector('.h-pass');
+                let h_notes = cardBody.querySelector('.h-notes');
+                h_title.innerText = h_item.Title;
+                h_user.innerText = h_item.Username;
+                h_pass.innerText = h_item.Password;
+                h_notes.innerText = h_item.Notes;
 
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'api/delete-history');
-                    xhr.onerror = function () {
-                        window.alert('An error occurred during the transaction');
-                    }
-                    xhr.onload = function () {
-                        if (this.status == 200) {
-                            liElem.setAttribute('hidden', '');
-                        } else {
-                            window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                $(delDialog).modal({show: false});
+                delButton.addEventListener('click', function() {
+                    $(delDialog).modal('show');
+                    datetimeInModal.innerText = simpleDatetime(dt);
+
+                    let yesBtn = delDialog.querySelector('.SubmitButton');
+                    let yesBtnClone = yesBtn.cloneNode(true);
+                    yesBtn.replaceWith(yesBtnClone);
+
+                    yesBtn = delDialog.querySelector('.SubmitButton');
+                    yesBtn.addEventListener('click', function() {
+                        let form = new FormData();
+                        form.append('id', mima.ID);
+                        form.append('datetime', h_item.DateTime);
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/api/delete-history');
+                        xhr.onerror = function () {
+                            window.alert('An error occurred during the transaction');
                         }
-                    }
-                    xhr.addEventListener('loadend', function(){
-                        delForeverBtnElem.removeAttribute('hidden');
+                        xhr.onload = function () {
+                            if (this.status == 200) {
+                                cardElem.setAttribute('hidden', '');
+                            } else {
+                                window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                            }
+                        }
+                        xhr.addEventListener('loadend', function(){
+                            $(delDialog).modal('hide');
+                        });
+                        xhr.send(form);
                     });
-                    xhr.send(form);
                 });
+
                 itemListElem.insertBefore(itemNode, itemListElem.firstElementChild);
             }
         }
@@ -191,6 +292,7 @@
             event.preventDefault();
             let title = titleElem.value.trim();
             if (title.length == 0) {
+                errorElem.removeAttribute('hidden');
                 errorElem.innerText = 'Error: Title is empty.';
                 titleElem.focus();
                 return
@@ -206,17 +308,20 @@
             form.append('notes', notesElem.value);
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', 'api/edit');
+            xhr.open('POST', '/api/edit');
             xhr.onerror = function () {
                 window.alert('An error occurred during the transaction');
             }
             xhr.onload = function () {
                 if (this.status == 200) {
-                    errorElem.setAttribute('hidden', '');
                     formElem.setAttribute('hidden', '');
+                    errorElem.setAttribute('hidden', '');
                     historyElem.setAttribute('hidden', '');
                     okElem.removeAttribute('hidden');
+                    ok_a_elem.innerText = title;
+                    ok_a_elem.setAttribute('href', `edit?id=${this.responseText}`);
                 } else {
+                    errorElem.removeAttribute('hidden');
                     errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
                 }
             }
@@ -227,5 +332,5 @@
         }
         submitBtn.addEventListener('click', submit);
     </script>
-</body>
-</html>
+    </body>
+  </html>

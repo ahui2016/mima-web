@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add - mima</title>
+    <link rel="stylesheet" href="public/style.css">
+    <script type="text/javascript" src="public/main.js"></script>
+</head>
+<body>
+    <p><a href="home">home</a></p>
+
+    <h2>Add a new item</h2>
+
+    <p id="ErrorMessage"></p>
+
+    <p id="ok" hidden>OK, <a></a> is added.</p>
+
+    <form autocomplete="off">
+        <label>Title:
+            <input type="text" id="title" class="TextField" autofocus required
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Username:
+            <input type="text" id="username" class="TextField"
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Password:
+            (<span class="InlineButton" onclick="randomPassword()">random</span>)
+            <input type="text" id="password" class="TextField"
+                oninput="update_color_password()">
+            <div id="colorPassword"></div>
+        </label>
+        <label>Notes:
+            <textarea id="notes" class="TextField"
+                onblur="this.value = this.value.trim()"></textarea>
+        </label>
+        <p><input type="submit" disabled hidden></p>
+        <p><button id="submit">Submit</button></p>
+    </form>
+
+    <script>
+        let errorElem = document.querySelector('#ErrorMessage');
+        let okElem = document.querySelector('#ok');
+        let ok_a_elem = document.querySelector('#ok>a');
+        let formElem = document.querySelector('form');
+        let titleElem = document.querySelector('#title');
+        let userElem = document.querySelector('#username');
+        let passElem = document.querySelector('#password');
+        let colorPassElem = document.querySelector('#colorPassword');
+        let notesElem = document.querySelector('#notes');
+        let submitBtn = document.querySelector('#submit');
+
+        const textFieldWidth = 300;
+        let textFields = document.querySelectorAll('.TextField');
+        textFields.forEach(e => e.style.width = textFieldWidth + 'px');
+        submitBtn.style.marginLeft = textFieldWidth - submitBtn.offsetWidth + 'px';
+
+        function submit(event) {
+            event.preventDefault();
+            let title = titleElem.value.trim();
+            if (title.length == 0) {
+                errorElem.innerText = 'Error: Title is empty.';
+                titleElem.focus();
+                return
+            }
+            submitBtn.setAttribute('disabled', '');
+
+            let form = new FormData();
+            form.append('title', title);
+            form.append('username', userElem.value);
+            form.append('password', passElem.value);
+            form.append('notes', notesElem.value);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api/add');
+            xhr.onerror = function () {
+                window.alert('An error occurred during the transaction');
+            }
+            xhr.onload = function () {
+                if (this.status == 200) {
+                    formElem.setAttribute('hidden', '');
+                    errorElem.setAttribute('hidden', '');
+                    okElem.removeAttribute('hidden');
+                    ok_a_elem.innerText = title;
+                    ok_a_elem.setAttribute('href', `edit?id=${this.responseText}`);
+                } else {
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+                }
+            }
+            xhr.addEventListener('loadend', function(){
+                submitBtn.removeAttribute('disabled');
+            });
+            xhr.send(form);
+        }
+        submitBtn.addEventListener('click', submit);
+    </script>
+</body>
+</html>

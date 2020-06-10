@@ -19,34 +19,26 @@ func main() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	http.HandleFunc("/index", checkLogin(indexPage))
-	http.HandleFunc("/m/index", checkLogin(mIndexPage))
 	http.HandleFunc("/api/all-items", checkLogin(getAllHandler))
 	http.HandleFunc("/login", noMore(loginPage))
-	http.HandleFunc("/m/login", noMore(mLoginPage))
 	http.HandleFunc("/api/login", noMore(loginHandler))
 	http.HandleFunc("/logout", checkLogin(logoutHandler))
-	http.HandleFunc("/m/logout", checkLogin(logoutHandler))
 	http.HandleFunc("/add", checkLogin(addPage))
-	http.HandleFunc("/m/add", checkLogin(mAddPage))
 	http.HandleFunc("/api/add", checkLogin(addHandler))
 	http.HandleFunc("/api/random-password", checkLogin(randomPassword))
 	http.HandleFunc("/edit", checkLogin(editPage))
-	http.HandleFunc("/m/edit", checkLogin(mEditPage))
 	http.HandleFunc("/api/edit", checkLogin(editHandler))
 	http.HandleFunc("/api/item", checkLogin(getItemHandler))
 	http.HandleFunc("/api/delete-history", checkLogin(deleteHistory))
 	http.HandleFunc("/api/delete", checkLogin(deleteHandler))
 	http.HandleFunc("/recyclebin", checkLogin(recyclePage))
-	http.HandleFunc("/m/recyclebin", checkLogin(mRecyclePage))
 	http.HandleFunc("/api/deleted-items", checkLogin(getDeletedHandler))
 	http.HandleFunc("/api/recover", checkLogin(recoverHandler))
 	http.HandleFunc("/api/delete-forever", checkLogin(deleteForever))
 	http.HandleFunc("/search", checkLogin(searchPage))
-	http.HandleFunc("/m/search", checkLogin(mSearchPage))
 	http.HandleFunc("/api/search", checkLogin(searchHandler))
 	http.HandleFunc("/api/get-password", checkLogin(getPassword))
 	http.HandleFunc("/download", checkLogin(downloadPage))
-	http.HandleFunc("/m/download", checkLogin(downloadPage))
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
 
@@ -60,12 +52,12 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	case "/":
 		fallthrough
 	case "/home":
-		// fmt.Fprint(w, htmlFiles["search"])
-		http.Redirect(w, r, "/search", 302)
+		fallthrough
 	case "/m":
 		fallthrough
 	case "/m/home":
-		http.Redirect(w, r, "/m/search", 302)
+		// fmt.Fprint(w, htmlFiles["search"])
+		http.Redirect(w, r, "/search", 302)
 	default:
 		http.NotFound(w, r)
 	}
@@ -79,16 +71,8 @@ func indexPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["index"])
 }
 
-func mIndexPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, htmlFiles["m-index"])
-}
-
 func recyclePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["recyclebin"])
-}
-
-func mRecyclePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, htmlFiles["m-recyclebin"])
 }
 
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,10 +93,6 @@ func getDeletedHandler(w http.ResponseWriter, r *http.Request) {
 
 func loginPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["login"])
-}
-
-func mLoginPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, htmlFiles["m-login"])
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -155,10 +135,6 @@ func addPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["add"])
 }
 
-func mAddPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, htmlFiles["m-add"])
-}
-
 func addHandler(w http.ResponseWriter, r *http.Request) {
 	form := &mima.EditForm{
 		Title:    strings.TrimSpace(r.FormValue("title")),
@@ -179,10 +155,6 @@ func randomPassword(w http.ResponseWriter, r *http.Request) {
 
 func editPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["edit"])
-}
-
-func mEditPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, htmlFiles["m-edit"])
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
@@ -231,10 +203,6 @@ func deleteForever(w http.ResponseWriter, r *http.Request) {
 
 func searchPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, htmlFiles["search"])
-}
-
-func mSearchPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, htmlFiles["m-search"])
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {

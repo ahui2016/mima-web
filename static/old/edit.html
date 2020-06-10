@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit - mima</title>
+    <link rel="stylesheet" href="public/style.css">
+    <script type="text/javascript" src="public/main.js"></script>
+</head>
+<body>
+    <p><a href="home">home</a></p>
+
+    <h2>Edit - mima</h2>
+
+    <p id="ErrorMessage"></p>
+
+    <p id="ok" hidden>Edit OK.</p>
+
+    <p class="LoadingMessage">Loading...</p>
+
+    <form id="EditForm" autocomplete="off" hidden>
+        <label>Title:
+            <input type="text" id="title" class="TextField" autofocus required
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Alias:
+            <input type="text" id="alias" class="TextField"
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Username:
+            <input type="text" id="username" class="TextField"
+                onblur="this.value = this.value.trim()">
+        </label>
+        <label>Password:
+            <span class="InlineButton" onclick="randomPassword()">random</span>
+            <input type="text" id="password" class="TextField"
+                oninput="update_color_password()">
+            <div id="colorPassword"></div>
+        </label>
+        <label>Notes:
+            <textarea id="notes" class="TextField"
+                onblur="this.value = this.value.trim()"></textarea>
+        </label>
+        <p><input type="submit" disabled hidden></p>
+        <p><button id="submit">Submit</button></p>
+    </form>
+
+    <div id="history" hidden>
+        <p>History</p>
+        <hr>
+        <ul id="item-list">
+            <template id="item-tmpl">
+                <li>
+                    <div>
+                        <strong class="Title"></strong>
+                        <span class="DeleteButton InlineButton">delete</span>
+                        <span class="DelForeverButton RedButton" hidden>delete forever</span>
+                        <br>
+                        <span class="DateTime"></span>
+                        <br>
+                        <span class="Username"></span>
+                        <span class="Password"></span>
+                        <span class="Notes"></span>
+                    </div>
+                </li>
+            </template>
+        </ul>
+    </div>
+
+    <script>
+        let errorElem = document.querySelector('#ErrorMessage');
+        let okElem = document.querySelector('#ok');
+        let ok_a_elem = document.querySelector('#ok>a');
+        let loadingElem = document.querySelector('.LoadingMessage');
+        let formElem = document.querySelector('#EditForm');
+        let submitBtn = document.querySelector('#submit');
+        let historyElem = document.querySelector('#history');
+        let itemListElem = document.querySelector('#item-list');
+        let itemTmplElem = document.querySelector('#item-tmpl');
+
+        let titleElem = document.querySelector('#title');
+        let aliasElem = document.querySelector('#alias');
+        let userElem = document.querySelector('#username');
+        let passElem = document.querySelector('#password');
+        let colorPassElem = document.querySelector('#colorPassword');
+        let notesElem = document.querySelector('#notes');
+
+        // set length
+        const textFieldWidth = 300;
+        let textFields = document.querySelectorAll('.TextField');
+        textFields.forEach(e => e.style.width = textFieldWidth + 'px');
+        submitBtn.style.marginLeft = textFieldWidth - submitBtn.offsetWidth + 'px';
+
+        // set data
+        let loc = new URL(document.location);
+        let id = loc.searchParams.get('id');
+        setData();
+
+        function setData() {
+            let form = new FormData();
+            form.append('id', id);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api/item');
+
+            xhr.onerror = function () {
+                window.alert('An error occurred during the transaction');
+            }
+            xhr.onload = function () {
+                if (this.status == 200) {
+                    formElem.removeAttribute('hidden');
+                    loadingElem.setAttribute('hidden', '');
+
+                    let mima = JSON.parse(this.responseText);
+                    titleElem.value = mima.Title;
+                    aliasElem.value = mima.Alias;
+                    userElem.value = mima.Username;
+                    passElem.value = mima.Password;
+                    notesElem.value = mima.Notes;
+                    update_color_password();
+                    fillHistory(mima);
+                } else {
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+                }
+            }
+            xhr.send(form);
+        }
+
+        function fillHistory(mima) {
+            if (mima.History == null || mima.History.length == 0) {
+                return
+            }
+            historyElem.removeAttribute('hidden');
+            for (let h_item of mima.History) {
+                let itemNode = itemTmplElem.content.cloneNode(true);
+                let liElem = itemNode.querySelector('li');
+                let itemDiv = itemNode.querySelector('div');
+                let titleElem = itemDiv.querySelector('.Title');
+                let delBtnElem = itemDiv.querySelector('.DeleteButton');
+                let delForeverBtnElem = itemDiv.querySelector('.DelForeverButton');
+                let datetimeElem = itemDiv.querySelector('.DateTime');
+                let userElem = itemDiv.querySelector('.Username');
+                let passwordElem = itemDiv.querySelector('.Password');
+                let notesElem = itemDiv.querySelector('.Notes');
+
+                titleElem.innerText = h_item.Title;
+                let datetime = new Date(h_item.DateTime);
+                datetimeElem.innerText = `DateTime: ${datetime}`;
+                if (h_item.Username) {
+                    userElem.innerText = `Username: ${h_item.Username}`;
+                }
+                if (h_item.Password) {
+                    passwordElem.innerText = `Password: ${h_item.Password}`;
+                }
+                if (h_item.Notes) {
+                    notesElem.innerText = `Notes: ${h_item.Notes}`;
+                }
+
+                delBtnElem.addEventListener('click', function() {
+                    delBtnElem.setAttribute('hidden', '');
+                    delForeverBtnElem.removeAttribute('hidden');
+                });
+                delForeverBtnElem.addEventListener('click', function() {
+                    delForeverBtnElem.setAttribute('hidden', '');
+
+                    let form = new FormData();
+                    form.append('id', id);
+                    form.append('datetime', h_item.DateTime);
+
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'api/delete-history');
+                    xhr.onerror = function () {
+                        window.alert('An error occurred during the transaction');
+                    }
+                    xhr.onload = function () {
+                        if (this.status == 200) {
+                            liElem.setAttribute('hidden', '');
+                        } else {
+                            window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
+                        }
+                    }
+                    xhr.addEventListener('loadend', function(){
+                        delForeverBtnElem.removeAttribute('hidden');
+                    });
+                    xhr.send(form);
+                });
+                itemListElem.insertBefore(itemNode, itemListElem.firstElementChild);
+            }
+        }
+
+        function submit(event) {
+            event.preventDefault();
+            let title = titleElem.value.trim();
+            if (title.length == 0) {
+                errorElem.innerText = 'Error: Title is empty.';
+                titleElem.focus();
+                return
+            }
+            submitBtn.setAttribute('disabled', '');
+
+            let form = new FormData();
+            form.append('id', id);
+            form.append('title', title);
+            form.append('alias', aliasElem.value);
+            form.append('username', userElem.value);
+            form.append('password', passElem.value);
+            form.append('notes', notesElem.value);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api/edit');
+            xhr.onerror = function () {
+                window.alert('An error occurred during the transaction');
+            }
+            xhr.onload = function () {
+                if (this.status == 200) {
+                    errorElem.setAttribute('hidden', '');
+                    formElem.setAttribute('hidden', '');
+                    historyElem.setAttribute('hidden', '');
+                    okElem.removeAttribute('hidden');
+                } else {
+                    errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+                }
+            }
+            xhr.addEventListener('loadend', function(){
+                submitBtn.removeAttribute('disabled');
+            });
+            xhr.send(form);
+        }
+        submitBtn.addEventListener('click', submit);
+    </script>
+</body>
+</html>

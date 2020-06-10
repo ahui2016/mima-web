@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
@@ -13,11 +12,7 @@ func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
 		}
 		if isLoggedOut(r) {
 			if r.Method != http.MethodPost {
-				if strings.HasPrefix(r.URL.Path, "/m/") {
-					fmt.Fprint(w, htmlFiles["m-login"])
-				} else {
-					fmt.Fprint(w, htmlFiles["login"])
-				}
+				fmt.Fprint(w, htmlFiles["login"])
 				return
 			}
 
