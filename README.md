@@ -12,8 +12,7 @@
 
 前端界面使用 Bootstrap 重写，好看了很多。
 
-- 旧版 demo <http://demo.ai42.xyz> (密码：abc)
-- 新版 demo <http://demo.ai42.xyz/m> (密码：abc)
+- demo <http://demo.ai42.xyz> (密码：abc)
 
 ## Install
 
@@ -25,13 +24,12 @@
 
 Done.
 
-## 全原生代码
+## 原生代码
 
 - 后端采用 Go 语言，未使用框架，由标准库搭建
 - 不使用数据库，既免除了数据库相关设置的麻烦，又能减轻服务器负担
   (不使用 sqlite, 因此编译速度不会被 cgo 拖慢)
-- 前端没有 React、Vue，没有 JQuery，没有 Bootstrap，只有原生 HTML, JS, CSS
-- 页面非常简陋（其中 CSS 只有约 50 行，可见一斑）
+- 前端没有 React、Vue，只使用原生 JS 和 Bootstrap
 - 前后端分离，前端可根据个人需要用各种框架/库改写，不需要修改后端
 
 ## 解决什么问题
@@ -87,11 +85,7 @@ v2ex.com 的用户名到剪贴板，执行 `mypass -p v2` 就能复制密码到�
 
 ## Demo
 
-<http://demo.ai42.xyz> (密码：abc) (页面未做移动端适配)
-
-### 新版 demo
-
-<http://demo.ai42.xyz/m> (密码：abc) (已适配移动端)
+<http://demo.ai42.xyz> (密码：abc)
 
 ## Requirement
 
