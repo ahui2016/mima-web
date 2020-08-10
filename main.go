@@ -52,11 +52,6 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	case "/":
 		fallthrough
 	case "/home":
-		fallthrough
-	case "/m":
-		fallthrough
-	case "/m/home":
-		// fmt.Fprint(w, htmlFiles["search"])
 		http.Redirect(w, r, "/search", 302)
 	default:
 		http.NotFound(w, r)

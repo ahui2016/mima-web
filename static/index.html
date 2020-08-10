@@ -151,6 +151,7 @@
         let topContainer = document.querySelector('.container');
 
         let delDialog = document.querySelector('#delete-dialog');
+        $(delDialog).modal({show: false});
         let titleInModal = document.querySelector('#title-in-modal');
 
         refillList();
@@ -223,20 +224,23 @@ function refillList() {
                         }
                         xhr.onload = function () {
                             if (this.status == 200) {
-                                new Promise(resolve => resolve(textForCopy.removeAttribute('hidden')))
-                                    .then(() => textForCopy.value = this.responseText)
-                                    .then(() => textForCopy.select())
-                                    .then(() => document.execCommand('copy'))
-                                    .then(() => $(passCopyBtn).tooltip('dispose')
-                                        .attr('title', 'copied!')
-                                        .tooltip()
-                                        .tooltip('show'))
-                                    .then(() => window.setTimeout(function(){
-                                        $(passCopyBtn).tooltip('dispose')
-                                            .attr('title', 'copy password')
-                                            .tooltip();
-                                        }, 2000))
-                                    .then(() => textForCopy.setAttribute('hidden', ''));
+                                new Promise(resolve => {
+                                    textForCopy.removeAttribute('hidden');
+                                    resolve();
+                                })
+                                .then(() => textForCopy.value = this.responseText)
+                                .then(() => textForCopy.select())
+                                .then(() => document.execCommand('copy'))
+                                .then(() => $(passCopyBtn).tooltip('dispose')
+                                    .attr('title', 'copied!')
+                                    .tooltip()
+                                    .tooltip('show'))
+                                .then(() => window.setTimeout(function(){
+                                    $(passCopyBtn).tooltip('dispose')
+                                        .attr('title', 'copy password')
+                                        .tooltip();
+                                    }, 2000))
+                                .then(() => textForCopy.setAttribute('hidden', ''));
                             } else {
                                 window.alert(`Error: ${this.status} ${this.statusText} ${this.responseText}`);
                             }
@@ -250,7 +254,6 @@ function refillList() {
                 $(editBtnElem).tooltip();
                 $(delBtnElem).tooltip();
 
-                $(delDialog).modal({show: false});
                 delBtnElem.addEventListener('click', function() {
                     $(delDialog).modal('show');
                     titleInModal.innerText = item.Title;
