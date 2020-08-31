@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+func handlerToFunc(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		h.ServeHTTP(w, r)
+	}
+}
+
 func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if checkPasswordTry(w) {

@@ -16,6 +16,10 @@ func main() {
 	fs := http.FileServer(http.Dir("public/"))
 	http.Handle("/public/", http.StripPrefix("/public/", fs))
 
+	hiddenFS := http.FileServer(http.Dir("hidden/"))
+	hiddenFS = http.StripPrefix("/hidden/", hiddenFS)
+	http.HandleFunc("/hidden/", checkLogin(handlerToFunc(hiddenFS)))
+
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	http.HandleFunc("/index", checkLogin(indexPage))
