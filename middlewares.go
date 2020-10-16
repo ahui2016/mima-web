@@ -26,6 +26,15 @@ func checkLogin(fn http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Logged Out", 400)
 			return
 		}
+
+		// Demo版 限制大小
+		var maxBytes int64 = 1024 // 1KB
+		r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
+		if db.Len() > 1000 {
+			http.Error(w, "到达Demo版上限", http.StatusNotFound)
+			return
+		}
+
 		fn(w, r)
 	}
 }
