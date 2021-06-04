@@ -101,7 +101,7 @@ func (db *DB) Init(password string) error {
 }
 
 func (db *DB) removeOldTarball() error {
-	tarballs, err := db.getTarPaths()
+	tarballs, err := db.getTarballs()
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func (db *DB) getFragments() ([]string, error) {
 	return util.GetPathsByExt(db.Directory, fragmentExt)
 }
 
-func (db *DB) getTarPaths() ([]string, error) {
+func (db *DB) getTarballs() ([]string, error) {
 	return util.GetPathsByExt(db.Directory, tarballExt)
 }
 

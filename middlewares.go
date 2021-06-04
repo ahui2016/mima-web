@@ -46,7 +46,7 @@ func noMore(fn http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		if !isLoggedOut(r) {
-			fmt.Fprint(w, htmlFiles["m-loggedin"])
+			fmt.Fprint(w, htmlFiles["loggedin"])
 			// http.Error(w, "You've logged in.", 400)
 			return
 		}

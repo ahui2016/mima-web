@@ -201,7 +201,6 @@ function refillList() {
                         document.execCommand('copy');
                         $(userCopyBtn).tooltip('dispose')
                             .attr('title', 'copied!')
-                            .tooltip()
                             .tooltip('show');
                         window.setTimeout(function(){
                             $(userCopyBtn).tooltip('dispose')
@@ -233,7 +232,6 @@ function refillList() {
                                 .then(() => document.execCommand('copy'))
                                 .then(() => $(passCopyBtn).tooltip('dispose')
                                     .attr('title', 'copied!')
-                                    .tooltip()
                                     .tooltip('show'))
                                 .then(() => window.setTimeout(function(){
                                     $(passCopyBtn).tooltip('dispose')
