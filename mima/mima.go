@@ -2,6 +2,7 @@ package mima
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ahui2016/mima-web/util"
 )
@@ -150,4 +151,63 @@ type EditForm struct {
 	Username string
 	Password string
 	Notes    string
+}
+
+type MimaWithHistory struct {
+	OutputMima
+	History []OutputHistory
+}
+
+type OutputMima struct {
+	ID       string
+	Title    string
+	Label    string
+	Username string
+	Password string
+	Notes    string
+	CTime    int64
+	MTime    int64
+}
+
+type OutputHistory struct {
+	ID       string
+	MimaID   string
+	Title    string
+	Username string
+	Password string
+	Notes    string
+	CTime    int64
+}
+
+func MWH_From(m *Mima) (mwh MimaWithHistory) {
+	ctime, err := time.Parse(util.ISO8601, m.CreatedAt)
+	util.Panic(err)
+	mtime, err := time.Parse(util.ISO8601, m.UpdatedAt)
+	util.Panic(err)
+
+	mwh.ID = m.ID
+	mwh.Title = m.Title
+	mwh.Label = m.Alias
+	mwh.Username = m.Username
+	mwh.Password = m.Password
+	mwh.Notes = m.Notes
+	mwh.CTime = ctime.Unix()
+	mwh.MTime = mtime.Unix()
+
+	for _, h := range m.History {
+		dt, err := time.Parse(util.ISO8601, h.DateTime)
+		util.Panic(err)
+
+		var oh OutputHistory
+		oh.ID = util.NewID()
+		oh.MimaID = m.ID
+		oh.Title = h.Title
+		oh.Username = h.Username
+		oh.Password = h.Password
+		oh.Notes = h.Notes
+		oh.CTime = dt.Unix()
+
+		mwh.History = append(mwh.History, oh)
+	}
+	return
 }

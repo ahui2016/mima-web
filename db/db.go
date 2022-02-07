@@ -494,3 +494,15 @@ func (db *DB) GetByAlias(alias string) (items []*Mima) {
 	}
 	return
 }
+
+// ExportAll without deleted items.
+func (db *DB) ExportAll() (all []mima.MimaWithHistory) {
+	for i := db.Len() - 1; i > 0; i-- {
+		m := db.allItems[i]
+		if !m.IsDeleted() {
+			mwh := mima.MWH_From(m)
+			all = append(all, mwh)
+		}
+	}
+	return
+}

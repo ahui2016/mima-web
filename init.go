@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -35,7 +36,9 @@ type (
 )
 
 func init() {
-	db = mimadb.NewDB(util.DatabaseDefaultDir())
+	dbDir := util.DatabaseDefaultDir()
+	db = mimadb.NewDB(dbDir)
+	fmt.Println(dbDir)
 	sessionManager = session.NewManager(maxAge)
 	fillHtmlFiles()
 }

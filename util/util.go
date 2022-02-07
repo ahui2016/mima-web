@@ -84,3 +84,10 @@ func DeleteFiles(filePaths []string) error {
 func TimeNow() string {
 	return time.Now().Format(ISO8601)
 }
+
+// Panic panics if err != nil
+func Panic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
