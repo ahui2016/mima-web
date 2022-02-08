@@ -11,15 +11,25 @@
     <h2>Download a backup</h2>
 
     <div id="start-guide">
-        <p>Click the button below to generate a backup file of the database.</p>
+        <p>点击下面的按钮可生成数据库备份文件（内容已加密）</p>
         <p><button id="generate-button">generate</button></p>
+        <br><br>
+        <p>点击下面的按钮可生成 json 文件（注意，内容已解密）</p>
+        <p><button id="export-button">export to json</button></p>
     </div>
 
     <p id="ErrorMessage"></p>
 
     <div id="backup-file" hidden>
         <p>Right click the link below and save as a file.</p>
-        <p><a href="hidden/mimaweb.db.bak">mimaweb.db.bak</a></p>
+        <p><a href="hidden/mimaweb.db.bak" download="mimaweb.db.bak">mimaweb.db.bak</a></p>
+    </div>
+
+    <div id="exported-file" hidden>
+        <p>Right click the link below and save as a file.</p>
+        <p><a href="hidden/mimaweb.json" download="mimaweb.json">mimaweb.json</a></p>
+        <p>由于 json 文件包含明文隐私信息，下载后请点击下面的按钮删除服务器中的文件。</p>
+        <p><button id="deleteJSON">delete json file</button></p>
     </div>
 
     <p id="ok" hidden>OK.</p>
@@ -27,9 +37,11 @@
     <script>
     let startGuide = document.querySelector('#start-guide');
     let genButton = document.querySelector('#generate-button');
+    let exportBtn = document.querySelector('#export-button');
     let bakFile = document.querySelector('#backup-file');
+    let exportedFile = document.querySelector('#exported-file');
     let errorElem = document.querySelector('#ErrorMessage');
-    let resetButton = document.querySelector('#reset');
+    let delBtn = document.querySelector('#deleteJSON');
     let okMessage = document.querySelector('#ok');
 
     genButton.addEventListener('click', function() {
@@ -55,25 +67,48 @@
         xhr.send(form);
     });
 
-    resetButton.addEventListener('click', function() {
-        resetButton.setAttribute('disabled', '');
+    exportBtn.addEventListener('click', function() {
+        exportBtn.setAttribute('disabled', '');
         let form = new FormData();
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'api/delete-backup');
+        xhr.open('POST', 'api/export-json');
         xhr.onerror = function () {
             window.alert('An error occurred during the transaction');
         }
         xhr.onload = function () {
             if (this.status == 200) {
-                errorElem.setAttribute('hidden', '');
-                bakFile.setAttribute('hidden', '');
-                okMessage.removeAttribute('hidden');
+                errorElem.innerText = '';
+                startGuide.setAttribute('hidden', '');
+                exportedFile.removeAttribute('hidden');
             } else {
                 errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
             }
         }
         xhr.addEventListener('loadend', function(){
-            resetButton.removeAttribute('disabled');
+            exportBtn.removeAttribute('disabled');
+        });
+        xhr.send(form);
+    });
+
+    delBtn.addEventListener('click', function() {
+        delBtn.setAttribute('disabled', '');
+        let form = new FormData();
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api/delete-json');
+        xhr.onerror = function () {
+            window.alert('An error occurred during the transaction');
+        }
+        xhr.onload = function () {
+            if (this.status == 200) {
+                okMessage.removeAttribute('hidden');
+                okMessage.innerText = 'OK, deleted.';
+                exportedFile.setAttribute('hidden', '');
+            } else {
+                errorElem.innerText = `Error: ${this.status} ${this.statusText} ${this.responseText}`;
+            }
+        }
+        xhr.addEventListener('loadend', function(){
+            delBtn.removeAttribute('disabled');
         });
         xhr.send(form);
     });

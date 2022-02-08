@@ -19,6 +19,7 @@ const (
 	maxAge         = 60 * 30 // seconds
 	passwordMaxTry = 5
 	backupFilePath = "hidden/mimaweb.db.bak"
+	exportFilePath = "hidden/mimaweb.json"
 )
 
 var (

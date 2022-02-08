@@ -45,6 +45,8 @@ func main() {
 	http.HandleFunc("/download", checkLogin(downloadPage))
 	http.HandleFunc("/api/generate-backup", checkLogin(generateBackup))
 	http.HandleFunc("/api/delete-backup", checkLogin(deleteBackup))
+	http.HandleFunc("/api/export-json", checkLogin(exportHandler))
+	http.HandleFunc("/api/delete-json", checkLogin(deleteExportedFile))
 
 	addr := "127.0.0.1:8080"
 	fmt.Println(addr)
@@ -236,4 +238,12 @@ func generateBackup(w http.ResponseWriter, r *http.Request) {
 
 func deleteBackup(w http.ResponseWriter, r *http.Request) {
 	checkErr(w, os.Remove(backupFilePath), 500)
+}
+
+func exportHandler(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, db.ExportAll(exportFilePath), 500)
+}
+
+func deleteExportedFile(w http.ResponseWriter, r *http.Request) {
+	checkErr(w, os.Remove(exportFilePath), 500)
 }

@@ -496,7 +496,9 @@ func (db *DB) GetByAlias(alias string) (items []*Mima) {
 }
 
 // ExportAll without deleted items.
-func (db *DB) ExportAll() (all []mima.MimaWithHistory) {
+func (db *DB) ExportAll(filePath string) error {
+	var all []mima.MimaWithHistory
+
 	for i := db.Len() - 1; i > 0; i-- {
 		m := db.allItems[i]
 		if !m.IsDeleted() {
@@ -504,5 +506,9 @@ func (db *DB) ExportAll() (all []mima.MimaWithHistory) {
 			all = append(all, mwh)
 		}
 	}
-	return
+	data, err := json.MarshalIndent(all, "", "    ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filePath, data, 0644)
 }
