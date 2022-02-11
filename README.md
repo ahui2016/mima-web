@@ -12,6 +12,8 @@
 
 新增了导出数据库到 json 功能，并且导出后的数据可导入到新版 ([https://github.com/ahui2016/mima](https://github.com/ahui2016/mima)), 详见后文【如何备份数据】。
 
+另外，提供在线演示 https://mimaweb.ai42.xyz
+
 ## 2021-06-04 一周年
 
 这个 mima-web 自发布以来，已经一年了，我自己一直在使用，没啥大问题，程序很稳定。
